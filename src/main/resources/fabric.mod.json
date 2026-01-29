@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "circularrendering",
+  "version": "1.0.0",
+  "name": "Circular Rendering",
+  "description": "Changes Minecraft's render distance from square to 3D circle for FPS improvement",
+  "authors": [
+    "Uniaball"
+  ],
+  "contact": {
+    "homepage": "https://example.com/",
+    "sources": "https://github.com/Uniaball/circular-rendering"
+  },
+  "license": "MIT",
+  "icon": "assets/circularrendering/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.uniaball.circularrendering.CircularRenderingMod"
+    ],
+    "sodium:config_entry_point": [
+      "com.uniaball.circularrendering.integration.SodiumIntegration"
+    ]
+  },
+  "mixins": [
+    "circularrendering.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~1.21.11",
+    "sodium": ">=0.8.2"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ]
+    }
+  }
+}
