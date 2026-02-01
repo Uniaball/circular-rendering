@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "circularrendering.refmap.json",
   "client": [
-    "WorldRendererMixin"
+    //"WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
