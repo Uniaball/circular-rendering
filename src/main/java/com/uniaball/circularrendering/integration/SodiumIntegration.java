@@ -4,12 +4,7 @@ import com.uniaball.circularrendering.config.CircularRenderingConfig;
 import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
 import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
-import net.caffeinemc.mods.sodium.api.config.structure.BooleanOptionBuilder;
-import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
-import net.caffeinemc.mods.sodium.api.config.structure.DoubleOptionBuilder;
-import net.caffeinemc.mods.sodium.api.config.structure.IntegerOptionBuilder;
-import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
-import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
+import net.caffeinemc.mods.sodium.api.config.structure.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -47,17 +42,17 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setDefaultValue(true)
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         
-        mainGroup.addOption(builder.createDoubleOption(Identifier.of("circularrendering", "radius_multiplier"))
+        mainGroup.addOption(builder.createIntegerOption(Identifier.of("circularrendering", "radius_multiplier"))
                 .setName(Text.translatable("circularrendering.option.radius_multiplier"))
                 .setTooltip(Text.translatable("circularrendering.option.radius_multiplier.tooltip"))
-                .setRange(0.5, 2.0, 0.1)
+                .setRange(5, 20, 1)
                 .setStorageHandler(ModConfig::save)
-                .setValueFormatter(v -> Text.literal(String.format("%.1fx", v)))
+                .setValueFormatter(v -> Text.literal(String.format("%.1fx", v / 10.0)))
                 .setBinding(v -> { 
-                    config.radiusMultiplier = v; 
+                    config.radiusMultiplier = v / 10.0; 
                     ModConfig.resetCache(); 
-                }, () -> config.radiusMultiplier)
-                .setDefaultValue(1.0)
+                }, () -> (int)(config.radiusMultiplier * 10))
+                .setDefaultValue(10)
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         
         page.addOptionGroup(mainGroup);
@@ -80,7 +75,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setTooltip(Text.translatable("circularrendering.option.vertical_radius.tooltip"))
                 .setRange(8, 32, 1)
                 .setStorageHandler(ModConfig::save)
-                .setValueFormatter(v -> Text.translatable("circularrendering.option.vertical_radius.format", v))
+                .setValueFormatter(v -> Text.literal(v + " chunks"))
                 .setBinding(v -> { 
                     config.verticalRadius = v; 
                     ModConfig.resetCache(); 

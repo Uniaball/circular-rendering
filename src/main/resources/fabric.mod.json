@@ -28,7 +28,7 @@
   "depends": {
     "fabricloader": ">=0.18.4",
     "minecraft": "~1.21.11",
-    "sodium": ">=0.8.2"
+    "sodium": ">=0.8.4"
   },
   "custom": {
     "modmenu": {
