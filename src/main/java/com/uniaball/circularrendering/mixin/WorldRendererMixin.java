@@ -20,7 +20,7 @@ public class WorldRendererMixin {
     private void redirectScheduleChunkRender(WorldRenderer worldRenderer, int x, int y, int z, boolean important) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null) {
-            worldRenderer.scheduleChunkRender(x, y, z, important);
+            ((WorldRendererInvoker) worldRenderer).invokeScheduleChunkRender(x, y, z, important);
             return;
         }
 
@@ -32,7 +32,7 @@ public class WorldRendererMixin {
         double dz = centerZ - client.player.getZ();
 
         if (dx * dx + dz * dz <= radius * radius) {
-            worldRenderer.scheduleChunkRender(x, y, z, important);
+            ((WorldRendererInvoker) worldRenderer).invokeScheduleChunkRender(x, y, z, important);
         }
     }
 }
