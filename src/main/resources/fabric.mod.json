@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.uniaball.circularrendering.CircularRendering"
+			"com.uniaball.circularrendering.CircularRenderingMod"
 		]
 	},
 	"mixins": [
