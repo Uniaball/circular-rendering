@@ -3,9 +3,11 @@
   "minVersion": "0.8",
   "package": "com.uniaball.circularrendering.mixin",
   "compatibilityLevel": "JAVA_21",
-  "refmap": "circularrendering.refmap.json",
+  "mixins": [
+    "WorldRendererMixin"
+  ],
   "client": [
-    //"WorldRendererMixin"
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
