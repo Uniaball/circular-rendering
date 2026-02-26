@@ -1,0 +1,6 @@
+{
+    "circular-rendering.options.title": "圆形渲染",
+    "circular-rendering.group.circular_rendering": "圆形渲染",
+    "circular-rendering.option.render_radius_scale": "渲染半径缩放",
+    "circular-rendering.option.render_radius_scale.tooltip": "缩放渲染圆形的半径。值越小，剔除越激进。"
+}

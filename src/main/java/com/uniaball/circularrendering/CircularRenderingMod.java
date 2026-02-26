@@ -1,5 +1,6 @@
 package com.uniaball.circularrendering;
 
+import com.uniaball.circularrendering.config.ModConfig;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ public class CircularRenderingMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("Circular Rendering mod initialized!");
+        ModConfig.getInstance();
+        LOGGER.info("Circular Rendering initialized!");
     }
 }

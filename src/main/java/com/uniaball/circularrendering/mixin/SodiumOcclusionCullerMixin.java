@@ -1,5 +1,6 @@
 package com.uniaball.circularrendering.mixin;
 
+import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.CameraTransform;
@@ -20,7 +21,9 @@ public class SodiumOcclusionCullerMixin {
         if (player == null) return;
 
         int viewDistance = client.options.getViewDistance().getValue();
-        double radius = viewDistance * 16.0;
+        double baseRadius = viewDistance * 16.0;
+        double scale = ModConfig.getInstance().renderRadiusScale;
+        double radius = baseRadius * scale;
         double radiusSq = radius * radius;
 
         int originX = section.getOriginX();

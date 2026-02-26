@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"com.uniaball.circularrendering.CircularRenderingMod"
+		],
+		"sodium:config": [
+			"com.uniaball.circularrendering.integration.SodiumIntegration"
 		]
 	},
 	"mixins": [

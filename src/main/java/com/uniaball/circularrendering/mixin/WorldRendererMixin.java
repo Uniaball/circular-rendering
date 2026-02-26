@@ -1,5 +1,6 @@
 package com.uniaball.circularrendering.mixin;
 
+import com.uniaball.circularrendering.config.ModConfig;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import net.minecraft.client.MinecraftClient;
@@ -38,7 +39,9 @@ public class WorldRendererMixin {
         }
 
         int viewDistance = client.options.getViewDistance().getValue();
-        double radius = viewDistance * 16.0;
+        double baseRadius = viewDistance * 16.0;
+        double scale = ModConfig.getInstance().renderRadiusScale;
+        double radius = baseRadius * scale;
         double radiusSq = radius * radius;
         double playerX = client.player.getX();
         double playerZ = client.player.getZ();
