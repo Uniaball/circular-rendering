@@ -30,7 +30,9 @@ public class ModConfig {
                 e.printStackTrace();
             }
         }
-        return new ModConfig();
+        ModConfig config = new ModConfig();
+        config.save();
+        return config;
     }
 
     public void save() {
