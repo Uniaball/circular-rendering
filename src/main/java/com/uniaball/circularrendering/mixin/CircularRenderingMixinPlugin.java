@@ -3,6 +3,7 @@ package com.uniaball.circularrendering.mixin;
 import net.fabricmc.loader.api.FabricLoader;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
+import org.objectweb.asm.tree.ClassNode;
 
 import java.util.List;
 import java.util.Set;
