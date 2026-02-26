@@ -14,6 +14,8 @@ public class ModConfig {
     private static ModConfig INSTANCE;
 
     public double renderRadiusScale = 1.0;
+    public boolean enableVerticalRange = false;
+    public int verticalRange = 16;
 
     public static ModConfig getInstance() {
         if (INSTANCE == null) {

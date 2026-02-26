@@ -20,9 +20,11 @@ public class SodiumOcclusionCullerMixin {
         ClientPlayerEntity player = client.player;
         if (player == null) return;
 
+        ModConfig config = ModConfig.getInstance();
+
         int viewDistance = client.options.getViewDistance().getValue();
         double baseRadius = viewDistance * 16.0;
-        double scale = ModConfig.getInstance().renderRadiusScale;
+        double scale = config.renderRadiusScale;
         double radius = baseRadius * scale;
         double radiusSq = radius * radius;
 
@@ -35,6 +37,17 @@ public class SodiumOcclusionCullerMixin {
 
         if (dx * dx + dz * dz > radiusSq) {
             cir.setReturnValue(false);
+            return;
+        }
+
+        if (config.enableVerticalRange) {
+            int originY = section.getOriginY();
+            int chunkY = originY >> 4;
+            int playerChunkY = player.getBlockY() >> 4;
+            int dy = Math.abs(chunkY - playerChunkY);
+            if (dy > config.verticalRange) {
+                cir.setReturnValue(false);
+            }
         }
     }
 }
