@@ -16,6 +16,7 @@ import java.util.List;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
+
     @Redirect(
         method = "renderBlockLayers",
         at = @At(

@@ -3,8 +3,10 @@
   "minVersion": "0.8",
   "package": "com.uniaball.circularrendering.mixin",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "com.uniaball.circularrendering.mixin.CircularRenderingMixinPlugin",
   "client": [
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "SodiumOcclusionCullerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
