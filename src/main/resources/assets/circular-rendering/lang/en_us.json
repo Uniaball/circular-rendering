@@ -2,5 +2,5 @@
     "circular-rendering.options.title": "Circular Rendering",
     "circular-rendering.group.circular_rendering": "Circular Rendering",
     "circular-rendering.option.render_radius_scale": "Render Radius Scale",
-    "circular-rendering.option.render_radius_scale.tooltip": "Scales the render distance circle. Lower values are more aggressive."
+    "circular-rendering.option.render_radius_scale.tooltip": "Scales the render distance circle (percentage). Lower values are more aggressive."
 }
