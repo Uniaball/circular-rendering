@@ -4,7 +4,6 @@ import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
 import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
-import net.caffeinemc.mods.sodium.api.config.structure.IntegerOptionBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.minecraft.text.Text;
@@ -26,13 +25,10 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setTooltip(Text.translatable("circular-rendering.option.render_radius_scale.tooltip"))
                 .setRange(10, 100, 1)
                 .setStorageHandler(config::save)
-                .setBinding(
-                    v -> {
-                        config.renderRadiusScale = v / 100.0;
-                        config.save();
-                    },
-                    () -> (int) Math.round(config.renderRadiusScale * 100)
-                )
+                .setBinding(v -> {
+                    config.renderRadiusScale = v / 100.0;
+                    config.save();
+                }, () -> (int) Math.round(config.renderRadiusScale * 100))
                 .setDefaultValue(100)
                 .setValueFormatter(v -> Text.literal(v + "%"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));

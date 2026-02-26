@@ -18,7 +18,7 @@
 		"main": [
 			"com.uniaball.circularrendering.CircularRenderingMod"
 		],
-		"sodium:config": [
+		"sodium:config_api_user": [
 			"com.uniaball.circularrendering.integration.SodiumIntegration"
 		]
 	},
