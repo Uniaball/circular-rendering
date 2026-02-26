@@ -32,7 +32,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	
 	// Sodium compile-time dependency (for mixin compatibility)
-	compileOnly "net.caffeinemc:sodium:${sodium_version}"
+	compileOnly "net.caffeinemc:sodium-fabric:${sodium_version}"
 }
 
 processResources {
