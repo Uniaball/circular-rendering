@@ -68,7 +68,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
-                .setEnabledProvider(() -> config.enableVerticalRange, Identifier.of("circular-rendering", "enable_vertical_range"))
+                .setEnabled(() -> config.enableVerticalRange)
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
 
         page.addOptionGroup(verticalGroup);
