@@ -26,7 +26,7 @@ public class WorldRendererMixin {
             target = "Lit/unimi/dsi/fastutil/objects/ObjectArrayList;listIterator(I)Lit/unimi/dsi/fastutil/objects/ObjectListIterator;"
         )
     )
-    private ObjectListIterator<ChunkBuilder.BuiltChunk> filterChunksForCircularRender(
+    private ObjectListIterator<ChunkBuilder.BuiltChunk> filterChunksForEllipticRender(
             ObjectArrayList<ChunkBuilder.BuiltChunk> list,
             int index,
             Matrix4fc matrix,
@@ -35,23 +35,31 @@ public class WorldRendererMixin {
             double cameraZ
     ) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) {
+        var player = client.player;
+        if (player == null) {
             return list.listIterator(index);
         }
 
         ModConfig config = ModConfig.getInstance();
 
         int viewDistance = client.options.getViewDistance().getValue();
-        double baseRadius = viewDistance * 16.0;
+        double maxRadius = viewDistance * 16.0;
         double scale = config.renderRadiusScale;
-        double radius = baseRadius * scale;
-        double radiusSq = radius * radius;
-        double playerX = client.player.getX();
-        double playerZ = client.player.getZ();
+        double shortRadius = maxRadius * scale;
+
+        double a2 = maxRadius * maxRadius;
+        double b2 = shortRadius * shortRadius;
+        double ab2 = a2 * b2;
+
+        double playerX = player.getX();
+        double playerZ = player.getZ();
+        float yawRad = player.getYaw() * MathHelper.RADIANS_PER_DEGREE;
+        double dirX = -MathHelper.sin(yawRad);
+        double dirZ = MathHelper.cos(yawRad);
 
         boolean verticalEnabled = config.enableVerticalRange;
         int verticalRange = config.verticalRange;
-        int playerChunkY = client.player.getBlockY() >> 4;
+        int playerChunkY = player.getBlockY() >> 4;
 
         List<ChunkBuilder.BuiltChunk> filtered = new ArrayList<>();
         for (ChunkBuilder.BuiltChunk chunk : list) {
@@ -61,14 +69,16 @@ public class WorldRendererMixin {
             double dx = centerX - playerX;
             double dz = centerZ - playerZ;
 
-            if (dx * dx + dz * dz > radiusSq) {
+            double forward = dx * dirX + dz * dirZ;
+            double right   = -dx * dirZ + dz * dirX;
+
+            if (forward * forward * b2 + right * right * a2 > ab2) {
                 continue;
             }
 
             if (verticalEnabled) {
                 int chunkY = origin.getY() >> 4;
-                int dy = Math.abs(chunkY - playerChunkY);
-                if (dy > verticalRange) {
+                if (Math.abs(chunkY - playerChunkY) > verticalRange) {
                     continue;
                 }
             }

@@ -2,14 +2,18 @@
 
 English | [中文](README.md)
 
-This is a Fabric mod that changes the vanilla rendering method to 3D spherical rendering.  
-It renders chunks only within a circle around the player, while chunk loading remains square. This reduces GPU load and improves FPS without affecting gameplay mechanics.
+This is a Fabric mod that changes the vanilla rendering method to 3D spherical (elliptical) rendering.  
+It renders chunks only within an ellipse around the player, with the forward/backward radius fixed to the view distance and the left/right radius scaled by a configurable factor. This reduces GPU load and improves FPS without affecting gameplay mechanics.
 
 ## Features
 
-- Renders chunks in a circle (radius = view distance × 16 blocks) centered on the player.
+- Renders chunks in an ellipse centered on the player:
+  - The forward/backward radius (along the player's viewing direction) is always `view distance × 16 blocks`.
+  - The left/right radius (perpendicular to the viewing direction) is scaled by a configurable factor (`renderRadiusScale`).
+- When the scale is 100%, the ellipse becomes a perfect circle (original behavior).
+- Optional vertical range limitation: limit rendering to a certain number of chunk layers above and below the player.
 - Chunk loading (logic updates) remains square, so all chunks are still loaded and updated.
-- Configurable render radius scale – make the circle smaller for even more aggressive culling.
+- Configurable render radius scale – make the ellipse narrower for even more aggressive culling.
 - Compatible with Sodium:
   - When Sodium is present, a configuration slider appears in the Video Settings screen.
   - Without Sodium, the mod works standalone using a JSON config file.
@@ -35,8 +39,9 @@ It renders chunks only within a circle around the player, while chunk loading re
 1. Go to **Options → Video Settings**.
 2. Scroll down to find the **Circular Rendering** section.
 3. Adjust the **Render Radius Scale** slider (10% – 100%).  
-   - 100% = normal circle (radius = view distance × 16).  
-   - Lower values make the circle smaller, culling more distant chunks.
+   - 100% = perfect circle (radius = view distance × 16).  
+   - Lower values make the ellipse narrower along the left/right axis, culling more chunks to the sides while keeping forward/backward visibility unchanged.
+4. Optionally enable **Custom Vertical Range** and set the **Vertical Range** (in chunk layers) to limit rendering above and below the player.
 
 ### Without Sodium
 
@@ -45,17 +50,27 @@ Example content:
 
 ```json
 {
-  "renderRadiusScale": 1.0
+  "renderRadiusScale": 1.0,
+  "enableVerticalRange": false,
+  "verticalRange": 16
 }
 ```
 
 - `renderRadiusScale` – a double between 0.1 and 1.0.  
-  Changes take effect after restarting the game or reloading chunks.
+- `enableVerticalRange` – a boolean, enables vertical range limiting when true.  
+- `verticalRange` – an integer (1–32), number of chunk layers to render above and below the player (each layer = 16 blocks).  
+
+Changes take effect after restarting the game or reloading chunks.
 
 ## How It Works
 
-- **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list, keeping only those inside the circle.
-- **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside the circle.
+- **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list, keeping only those inside an ellipse defined by:
+  ```
+  (forward² / a²) + (right² / b²) ≤ 1
+  ```
+  where `a = view distance × 16` (fixed forward/backward radius) and `b = a × renderRadiusScale` (scaled left/right radius).  
+  If vertical range is enabled, it also checks chunk Y layers.
+- **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside this ellipse or vertical range.
 
 Both approaches only affect chunk rendering; chunk loading remains square, so game mechanics (redstone, entity AI, etc.) work normally everywhere.
 

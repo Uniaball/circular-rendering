@@ -6,6 +6,7 @@ import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.CameraTransform;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,10 +24,13 @@ public class SodiumOcclusionCullerMixin {
         ModConfig config = ModConfig.getInstance();
 
         int viewDistance = client.options.getViewDistance().getValue();
-        double baseRadius = viewDistance * 16.0;
+        double maxRadius = viewDistance * 16.0;
         double scale = config.renderRadiusScale;
-        double radius = baseRadius * scale;
-        double radiusSq = radius * radius;
+        double shortRadius = maxRadius * scale;
+
+        double a2 = maxRadius * maxRadius;
+        double b2 = shortRadius * shortRadius;
+        double ab2 = a2 * b2;
 
         int originX = section.getOriginX();
         int originZ = section.getOriginZ();
@@ -35,7 +39,14 @@ public class SodiumOcclusionCullerMixin {
         double dx = centerX - player.getX();
         double dz = centerZ - player.getZ();
 
-        if (dx * dx + dz * dz > radiusSq) {
+        float yawRad = player.getYaw() * MathHelper.RADIANS_PER_DEGREE;
+        double dirX = -MathHelper.sin(yawRad);
+        double dirZ = MathHelper.cos(yawRad);
+
+        double forward = dx * dirX + dz * dirZ;
+        double right   = -dx * dirZ + dz * dirX;
+
+        if (forward * forward * b2 + right * right * a2 > ab2) {
             cir.setReturnValue(false);
             return;
         }
@@ -44,8 +55,7 @@ public class SodiumOcclusionCullerMixin {
             int originY = section.getOriginY();
             int chunkY = originY >> 4;
             int playerChunkY = player.getBlockY() >> 4;
-            int dy = Math.abs(chunkY - playerChunkY);
-            if (dy > config.verticalRange) {
+            if (Math.abs(chunkY - playerChunkY) > config.verticalRange) {
                 cir.setReturnValue(false);
             }
         }
