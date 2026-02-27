@@ -2,13 +2,15 @@ package com.uniaball.circularrendering.integration;
 
 import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
+import net.caffeinemc.mods.sodium.api.config.ConfigState;
 import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
-import net.caffeinemc.mods.sodium.api.config.state.ConfigState;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.function.Function;
 
 public class SodiumIntegration implements ConfigEntryPoint {
     @Override
@@ -69,7 +71,8 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
-                .setEnabledProvider((ConfigState state) -> config.enableVerticalRange, Identifier.of("circular-rendering", "enable_vertical_range"))
+                .setEnabledProvider((Function<ConfigState, Boolean>) (state) -> config.enableVerticalRange,
+                        Identifier.of("circular-rendering", "enable_vertical_range"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
 
         page.addOptionGroup(verticalGroup);
