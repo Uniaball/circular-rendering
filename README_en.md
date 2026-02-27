@@ -2,20 +2,20 @@
 
 English | [中文](README.md)
 
-This is a Fabric mod that changes the vanilla rendering method to 3D spherical (elliptical) rendering.  
-It renders chunks only within an ellipse around the player, with the forward/backward radius fixed to the view distance and the left/right radius scaled by a configurable factor. This reduces GPU load and improves FPS without affecting gameplay mechanics.
+This is a Fabric mod that modifies chunk rendering to a circular (or elliptical) shape around the player.  
+By default, it renders chunks within a perfect circle (radius = view distance × 16 blocks).  
+You can optionally scale the left/right radius to create an ellipse, culling more chunks to the sides while keeping forward/backward visibility unchanged. This reduces GPU load and improves FPS without affecting gameplay mechanics.
 
 ## Features
 
-- Renders chunks in an ellipse centered on the player:
-  - The forward/backward radius (along the player's viewing direction) is always `view distance × 16 blocks`.
-  - The left/right radius (perpendicular to the viewing direction) is scaled by a configurable factor (`renderRadiusScale`).
-- When the scale is 100%, the ellipse becomes a perfect circle (original behavior).
+- Renders chunks in a circle centered on the player (default behavior).
+- Optional elliptical rendering: the forward/backward radius remains fixed, while the left/right radius is scaled by a configurable factor (`renderRadiusScale`).
+  - When `renderRadiusScale = 1.0`, it's a perfect circle.
+  - When `renderRadiusScale < 1.0`, it becomes an ellipse (narrower left/right).
 - Optional vertical range limitation: limit rendering to a certain number of chunk layers above and below the player.
 - Chunk loading (logic updates) remains square, so all chunks are still loaded and updated.
-- Configurable render radius scale – make the ellipse narrower for even more aggressive culling.
 - Compatible with Sodium:
-  - When Sodium is present, a configuration slider appears in the Video Settings screen.
+  - When Sodium is present, configuration sliders appear in the Video Settings screen.
   - Without Sodium, the mod works standalone using a JSON config file.
 - No effect on entities or other objects – only chunk rendering is affected.
 
@@ -38,9 +38,9 @@ It renders chunks only within an ellipse around the player, with the forward/bac
 
 1. Go to **Options → Video Settings**.
 2. Scroll down to find the **Circular Rendering** section.
-3. Adjust the **Render Radius Scale** slider (10% – 100%).  
-   - 100% = perfect circle (radius = view distance × 16).  
-   - Lower values make the ellipse narrower along the left/right axis, culling more chunks to the sides while keeping forward/backward visibility unchanged.
+3. Adjust the **Render Radius Scale** slider (10% – 100%):  
+   - **100%** = perfect circle (radius = view distance × 16).  
+   - **Lower values** make the left/right radius smaller, turning the circle into an ellipse and culling more chunks to the sides.
 4. Optionally enable **Custom Vertical Range** and set the **Vertical Range** (in chunk layers) to limit rendering above and below the player.
 
 ### Without Sodium
@@ -57,6 +57,8 @@ Example content:
 ```
 
 - `renderRadiusScale` – a double between 0.1 and 1.0.  
+  - `1.0` = perfect circle.  
+  - `< 1.0` = ellipse (narrower left/right).
 - `enableVerticalRange` – a boolean, enables vertical range limiting when true.  
 - `verticalRange` – an integer (1–32), number of chunk layers to render above and below the player (each layer = 16 blocks).  
 
@@ -64,13 +66,13 @@ Changes take effect after restarting the game or reloading chunks.
 
 ## How It Works
 
-- **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list, keeping only those inside an ellipse defined by:
+- **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list using the shape defined by:
   ```
   (forward² / a²) + (right² / b²) ≤ 1
   ```
-  where `a = view distance × 16` (fixed forward/backward radius) and `b = a × renderRadiusScale` (scaled left/right radius).  
-  If vertical range is enabled, it also checks chunk Y layers.
-- **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside this ellipse or vertical range.
+  where `a = view distance × 16` (fixed forward/backward radius) and `b = a × renderRadiusScale` (left/right radius).  
+  When `b = a`, the shape is a circle. If vertical range is enabled, it also checks chunk Y layers.
+- **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside this shape or vertical range.
 
 Both approaches only affect chunk rendering; chunk loading remains square, so game mechanics (redstone, entity AI, etc.) work normally everywhere.
 
