@@ -3,7 +3,7 @@
     "circular-rendering.group.circle": "Horizontal Circle",
     "circular-rendering.group.vertical": "Vertical Range",
     "circular-rendering.option.render_radius_scale": "Render Radius Scale",
-    "circular-rendering.option.render_radius_scale.tooltip": "Scales the render distance circle (percentage). Lower values are more aggressive.",
+    "circular-rendering.option.render_radius_scale.tooltip": "Scales the render radius (percentage). Lower values reduce the left/right radius, making culling more aggressive.",
     "circular-rendering.option.enable_vertical_range": "Enable Custom Vertical Range",
     "circular-rendering.option.enable_vertical_range.tooltip": "When enabled, the slider below limits vertical render layers.",
     "circular-rendering.option.vertical_range": "Vertical Range",
