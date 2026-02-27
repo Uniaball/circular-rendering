@@ -34,9 +34,11 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         page.addOptionGroup(circleGroup);
 
+        Identifier enableId = Identifier.of("circular-rendering", "enable_vertical_range");
         OptionGroupBuilder verticalGroup = builder.createOptionGroup();
         verticalGroup.setName(Text.translatable("circular-rendering.group.vertical"));
-        verticalGroup.addOption(builder.createBooleanOption(Identifier.of("circular-rendering", "enable_vertical_range"))
+
+        verticalGroup.addOption(builder.createBooleanOption(enableId)
                 .setName(Text.translatable("circular-rendering.option.enable_vertical_range"))
                 .setTooltip(Text.translatable("circular-rendering.option.enable_vertical_range.tooltip"))
                 .setStorageHandler(config::save)
@@ -57,8 +59,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
-                .setEnabledProvider((ConfigState state) -> config.enableVerticalRange,
-                        Identifier.of("circular-rendering", "enable_vertical_range"))
+                .setEnabledProvider(state -> state.readBooleanOption(enableId), enableId)
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         page.addOptionGroup(verticalGroup);
 
