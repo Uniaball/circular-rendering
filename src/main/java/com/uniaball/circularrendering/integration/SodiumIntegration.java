@@ -9,6 +9,8 @@ import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.function.BooleanSupplier;
+
 public class SodiumIntegration implements ConfigEntryPoint {
     @Override
     public void registerConfigLate(ConfigBuilder builder) {
@@ -68,7 +70,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
-                .setEnabledProvider(() -> config.enableVerticalRange, Identifier.of("circular-rendering", "enable_vertical_range"))
+                .setEnabledProvider((BooleanSupplier) () -> config.enableVerticalRange, Identifier.of("circular-rendering", "enable_vertical_range"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
 
         page.addOptionGroup(verticalGroup);
