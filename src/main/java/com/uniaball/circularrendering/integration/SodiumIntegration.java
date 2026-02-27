@@ -2,6 +2,7 @@ package com.uniaball.circularrendering.integration;
 
 import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
+import net.caffeinemc.mods.sodium.api.config.option.BooleanProvider;
 import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
@@ -68,7 +69,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
-                .setEnabled(() -> config.enableVerticalRange)
+                .setEnabledProvider((BooleanProvider) () -> config.enableVerticalRange, Identifier.of("circular-rendering", "enable_vertical_range"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
 
         page.addOptionGroup(verticalGroup);
