@@ -1,52 +1,51 @@
-# 圆形渲染 (Circular Rendering)
+# Circular Rendering
 
-[English](README_en.md) | 中文
+English | [中文](README_zh.md)
 
-这是一个 Fabric 模组，将区块渲染改为以玩家为中心的圆形（或椭圆形）区域。  
-默认情况下，它渲染一个正圆（半径 = 视距 × 16 格）。  
-你可以选择缩放左右方向半径，使其变成椭圆，从而更激进地剔除侧面区块，同时保持前后方向视野不变。这减少了 GPU 负载，提升帧率，且不影响游戏机制。
+This is a Fabric mod that modifies chunk rendering to a circular (or elliptical) shape around the player.  
+By default, it renders chunks within a perfect circle (radius = view distance × 16 blocks).  
+You can optionally scale the left/right radius to create an ellipse, culling more chunks to the sides while keeping forward/backward visibility unchanged. This reduces GPU load and improves FPS without affecting gameplay mechanics.
 
-## 功能
+## Features
 
-- 以玩家为中心，渲染圆形区域内的区块（默认行为）。
-- 可选椭圆渲染：前后方向半径固定，左右方向半径可配置缩放因子（`renderRadiusScale`）。
-  - 当 `renderRadiusScale = 1.0` 时，为正圆。
-  - 当 `renderRadiusScale < 1.0` 时，变为椭圆（左右方向更窄）。
-- 可选的垂直范围限制：限制玩家上方和下方的渲染区块层数。
-- 区块加载（逻辑更新）保持方形，所有区块仍会加载和更新。
-- 兼容 Sodium：
-  - 当 Sodium 存在时，视频设置中会出现配置滑块。
-  - 无 Sodium 时，模组通过 JSON 配置文件独立工作。
-- 不影响实体或其他对象——只修改区块渲染。
+- Renders chunks in a circle centered on the player (default behavior).
+- Optional elliptical rendering: the forward/backward radius remains fixed, while the left/right radius is scaled by a configurable factor (`renderRadiusScale`).
+  - When `renderRadiusScale = 1.0`, it's a perfect circle.
+  - When `renderRadiusScale < 1.0`, it becomes an ellipse (narrower left/right).
+- Optional vertical range limitation: limit rendering to a certain number of chunk layers above and below the player.
+- Chunk loading (logic updates) remains square, so all chunks are still loaded and updated.
+- Compatible with Sodium:
+  - When Sodium is present, configuration sliders appear in the Video Settings screen.
+  - Without Sodium, the mod works standalone using a JSON config file.
+- No effect on entities or other objects – only chunk rendering is affected.
 
-## 依赖
+## Dependencies
 
-- **必需：** [Fabric Loader](https://fabricmc.net/) ≥0.18.4
-- **必需：** [Fabric API](https://modrinth.com/mod/fabric-api)（1.21.11 的任何版本）
-- **可选：** [Sodium](https://modrinth.com/mod/sodium) 0.8.6+（用于游戏内配置界面）
+- **Required:** [Fabric Loader](https://fabricmc.net/) ≥0.18.4
+- **Optional:** [Sodium](https://modrinth.com/mod/sodium) 0.8.6+ (for in-game GUI configuration)
 
-## 安装
+## Installation
 
-1. 安装 Fabric Loader，并将 `fabric-api` 放入 `mods` 文件夹。
-2. 从 [Releases](https://github.com/Uniaball/circular-rendering/releases) 页面下载最新的 `circular-rendering-<版本>.jar`。
-3. 将 JAR 放入 `mods` 文件夹。
-4. （可选）如需游戏内配置滑块，请同时安装 Sodium。
+1. Install Fabric Loader.
+2. Download the latest `circular-rendering-<version>.jar` from the [Releases](https://github.com/Uniaball/circular-rendering/releases) page.
+3. Put the JAR into your `mods` folder.
+4. (Optional) Install Sodium if you want the in-game configuration slider.
 
-## 配置
+## Configuration
 
-### 安装了 Sodium 时
+### With Sodium installed
 
-1. 进入 **选项 → 视频设置**。
-2. 向下滚动找到 **圆形渲染** 部分。
-3. 调整 **渲染半径缩放** 滑块（10% – 100%）：  
-   - **100%** = 正圆（半径 = 视距 × 16）。  
-   - **数值越小**，左右方向半径越小，圆形变为椭圆，剔除侧面区块更激进。
-4. 可选择开启 **启用自定义垂直渲染范围** 并设置 **垂直范围**（以区块层为单位），限制玩家上方和下方的渲染。
+1. Go to **Options → Video Settings**.
+2. Scroll down to find the **Circular Rendering** section.
+3. Adjust the **Render Radius Scale** slider (10% – 100%):  
+   - **100%** = perfect circle (radius = view distance × 16).  
+   - **Lower values** make the left/right radius smaller, turning the circle into an ellipse and culling more chunks to the sides.
+4. Optionally enable **Custom Vertical Range** and set the **Vertical Range** (in chunk layers) to limit rendering above and below the player.
 
-### 无 Sodium 时
+### Without Sodium
 
-模组会在 `.minecraft/config/circular-rendering.json` 创建 JSON 配置文件。  
-示例内容：
+The mod creates a JSON config file at `config/circular-rendering.json`.  
+Example content:
 
 ```json
 {
@@ -56,42 +55,42 @@
 }
 ```
 
-- `renderRadiusScale` – 介于 0.1 和 1.0 之间的浮点数。  
-  - `1.0` = 正圆。  
-  - `< 1.0` = 椭圆（左右方向更窄）。
-- `enableVerticalRange` – 布尔值，设为 true 时启用垂直范围限制。  
-- `verticalRange` – 整数（1–32），玩家上下各渲染的区块层数（每层 16 格）。  
+- `renderRadiusScale` – a double between 0.1 and 1.0.  
+  - `1.0` = perfect circle.  
+  - `< 1.0` = ellipse (narrower left/right).
+- `enableVerticalRange` – a boolean, enables vertical range limiting when true.  
+- `verticalRange` – an integer (1–32), number of chunk layers to render above and below the player (each layer = 16 blocks).  
 
-修改后需重启游戏或重新加载区块才能生效。
+Changes take effect after restarting the game or reloading chunks.
 
-## 工作原理
+## How It Works
 
-- **原版模式（无 Sodium）：** 模组注入 `WorldRenderer.renderBlockLayers` 方法，过滤区块列表，保留符合以下形状的区块：
+- **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list using the shape defined by:
   ```
   (forward² / a²) + (right² / b²) ≤ 1
   ```
-  其中 `a = 视距 × 16`（固定前后半径），`b = a × renderRadiusScale`（左右半径）。  
-  当 `b = a` 时，形状为正圆。若启用了垂直范围，还会检查区块 Y 层。
-- **Sodium 模式：** 模组注入 Sodium 的 `OcclusionCuller.isWithinRenderDistance` 方法，对形状外或超出垂直范围的区块返回 `false`。
+  where `a = view distance × 16` (fixed forward/backward radius) and `b = a × renderRadiusScale` (left/right radius).  
+  When `b = a`, the shape is a circle. If vertical range is enabled, it also checks chunk Y layers.
+- **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside this shape or vertical range.
 
-两种方式都只影响区块渲染；区块加载保持方形，因此游戏机制（红石、实体 AI 等）在所有位置均正常工作。
+Both approaches only affect chunk rendering; chunk loading remains square, so game mechanics (redstone, entity AI, etc.) work normally everywhere.
 
-## 兼容性
+## Compatibility
 
-- 适用于 Minecraft 1.21.11。
-- 与 Sodium 0.8.6+ 完全兼容（可同时使用）。
-- 应与大多数不深度修改区块渲染的模组兼容。如果遇到问题，请反馈。
+- Works with Minecraft 1.21.11.
+- Fully compatible with Sodium 0.8.6+ (both mods can be used together).
+- Should be compatible with most other mods that don't heavily modify chunk rendering. If you encounter issues, please report them.
 
-## 从源码构建
+## Building from Source
 
-克隆仓库后运行：
+Clone the repository and run:
 
 ```bash
 ./gradlew build
 ```
 
-构建的 JAR 文件位于 `build/libs/`。
+The built JAR will be in `build/libs/`.
 
-## 许可证
+## License
 
-本项目采用 MIT 许可证。详情请见 [LICENSE](LICENSE) 文件。
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
