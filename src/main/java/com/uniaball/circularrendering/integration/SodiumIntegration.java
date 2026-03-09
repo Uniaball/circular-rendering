@@ -2,7 +2,6 @@ package com.uniaball.circularrendering.integration;
 
 import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
-import net.caffeinemc.mods.sodium.api.config.ConfigState;
 import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
@@ -65,6 +64,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
 
         builder.registerOwnModOptions()
                 .setName("Circular Rendering")
+                .setIcon(Identifier.of("circular-rendering", "icon.png"))
                 .addPage(page);
     }
 }
