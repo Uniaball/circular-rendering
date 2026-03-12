@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "circular-rendering",
 	"version": "${version}",
-	"name": "circular rendering",
+	"name": "Circular Rendering",
 	"description": "A mod that changes the vanilla rendering method to 3D spherical rendering",
 	"authors": [
 		"Uniaball"
