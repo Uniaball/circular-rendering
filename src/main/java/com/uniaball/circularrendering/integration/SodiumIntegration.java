@@ -28,10 +28,10 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setTooltip(Text.translatable("circular-rendering.option.preset.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (value, flush) -> {
+                        (ModConfig.Preset value) -> {
                             if (applyingPreset) {
                                 config.preset = value;
-                                flush.accept(null);
+                                config.save();
                                 return;
                             }
                             applyingPreset = true;
@@ -56,7 +56,6 @@ public class SodiumIntegration implements ConfigEntryPoint {
                                     break;
                             }
                             config.save();
-                            flush.accept(null);
                             applyingPreset = false;
                         },
                         () -> config.preset
@@ -98,16 +97,16 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setRange(10, 100, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (value, flush) -> {
+                        (Integer value) -> {
                             double newScale = value / 100.0;
                             if (applyingPreset) {
                                 config.renderRadiusScale = newScale;
-                                flush.accept(null);
+                                config.save();
                                 return;
                             }
                             config.renderRadiusScale = newScale;
                             updatePresetIfNeeded();
-                            flush.accept(null);
+                            config.save();
                         },
                         () -> (int) Math.round(config.renderRadiusScale * 100)
                 )
@@ -125,15 +124,15 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setTooltip(Text.translatable("circular-rendering.option.enable_vertical_range.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (value, flush) -> {
+                        (Boolean value) -> {
                             if (applyingPreset) {
                                 config.enableVerticalRange = value;
-                                flush.accept(null);
+                                config.save();
                                 return;
                             }
                             config.enableVerticalRange = value;
                             updatePresetIfNeeded();
-                            flush.accept(null);
+                            config.save();
                         },
                         () -> config.enableVerticalRange
                 )
@@ -145,15 +144,15 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setRange(1, 32, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (value, flush) -> {
+                        (Integer value) -> {
                             if (applyingPreset) {
                                 config.verticalRange = value;
-                                flush.accept(null);
+                                config.save();
                                 return;
                             }
                             config.verticalRange = value;
                             updatePresetIfNeeded();
-                            flush.accept(null);
+                            config.save();
                         },
                         () -> config.verticalRange
                 )
