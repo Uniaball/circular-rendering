@@ -7,15 +7,88 @@ import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class SodiumIntegration implements ConfigEntryPoint {
+    private final ModConfig config = ModConfig.getInstance();
+    private boolean applyingPreset = false;
+
     @Override
     public void registerConfigLate(ConfigBuilder builder) {
-        ModConfig config = ModConfig.getInstance();
-
         OptionPageBuilder page = builder.createOptionPage();
         page.setName(Text.translatable("circular-rendering.options.title"));
+
+        OptionGroupBuilder presetGroup = builder.createOptionGroup();
+        presetGroup.setName(Text.translatable("circular-rendering.group.preset"));
+
+        Identifier presetId = Identifier.of("circular-rendering", "preset");
+        presetGroup.addOption(builder.createEnumOption(presetId, ModConfig.Preset.class)
+                .setName(Text.translatable("circular-rendering.option.preset"))
+                .setTooltip(Text.translatable("circular-rendering.option.preset.tooltip"))
+                .setStorageHandler(config::save)
+                .setBinding(
+                        (value, flush) -> {
+                            if (applyingPreset) {
+                                config.preset = value;
+                                flush.accept(null);
+                                return;
+                            }
+                            applyingPreset = true;
+                            config.preset = value;
+                            switch (value) {
+                                case AGGRESSIVE:
+                                    config.renderRadiusScale = 0.3;
+                                    config.enableVerticalRange = true;
+                                    config.verticalRange = 3;
+                                    break;
+                                case PERFORMANCE:
+                                    config.renderRadiusScale = 0.7;
+                                    config.enableVerticalRange = true;
+                                    config.verticalRange = 10;
+                                    break;
+                                case BALANCED:
+                                    config.renderRadiusScale = 1.0;
+                                    config.enableVerticalRange = false;
+                                    config.verticalRange = 16;
+                                    break;
+                                case CUSTOM:
+                                    break;
+                            }
+                            config.save();
+                            flush.accept(null);
+                            applyingPreset = false;
+                        },
+                        () -> config.preset
+                )
+                .setDefaultValue(ModConfig.Preset.BALANCED)
+                .setElementNameProvider(preset -> {
+                    Text name;
+                    switch (preset) {
+                        case AGGRESSIVE:
+                            name = Text.translatable("circular-rendering.preset.aggressive")
+                                    .copy().formatted(Formatting.RED);
+                            break;
+                        case PERFORMANCE:
+                            name = Text.translatable("circular-rendering.preset.performance")
+                                    .copy().formatted(Formatting.GOLD);
+                            break;
+                        case BALANCED:
+                            name = Text.translatable("circular-rendering.preset.balanced")
+                                    .copy().formatted(Formatting.GREEN);
+                            break;
+                        case CUSTOM:
+                            name = Text.translatable("circular-rendering.preset.custom")
+                                    .copy().formatted(Formatting.GRAY);
+                            break;
+                        default:
+                            name = Text.literal(preset.name());
+                    }
+                    return name;
+                })
+                .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
+        );
+        page.addOptionGroup(presetGroup);
 
         OptionGroupBuilder circleGroup = builder.createOptionGroup();
         circleGroup.setName(Text.translatable("circular-rendering.group.circle"));
@@ -25,8 +98,18 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setRange(10, 100, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
-                    v -> { config.renderRadiusScale = v / 100.0; config.save(); },
-                    () -> (int) Math.round(config.renderRadiusScale * 100)
+                        (value, flush) -> {
+                            double newScale = value / 100.0;
+                            if (applyingPreset) {
+                                config.renderRadiusScale = newScale;
+                                flush.accept(null);
+                                return;
+                            }
+                            config.renderRadiusScale = newScale;
+                            updatePresetIfNeeded();
+                            flush.accept(null);
+                        },
+                        () -> (int) Math.round(config.renderRadiusScale * 100)
                 )
                 .setDefaultValue(100)
                 .setValueFormatter(v -> Text.literal(v + "%"))
@@ -42,8 +125,17 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setTooltip(Text.translatable("circular-rendering.option.enable_vertical_range.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
-                    v -> { config.enableVerticalRange = v; config.save(); },
-                    () -> config.enableVerticalRange
+                        (value, flush) -> {
+                            if (applyingPreset) {
+                                config.enableVerticalRange = value;
+                                flush.accept(null);
+                                return;
+                            }
+                            config.enableVerticalRange = value;
+                            updatePresetIfNeeded();
+                            flush.accept(null);
+                        },
+                        () -> config.enableVerticalRange
                 )
                 .setDefaultValue(false));
 
@@ -53,8 +145,17 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setRange(1, 32, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
-                    v -> { config.verticalRange = v; config.save(); },
-                    () -> config.verticalRange
+                        (value, flush) -> {
+                            if (applyingPreset) {
+                                config.verticalRange = value;
+                                flush.accept(null);
+                                return;
+                            }
+                            config.verticalRange = value;
+                            updatePresetIfNeeded();
+                            flush.accept(null);
+                        },
+                        () -> config.verticalRange
                 )
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
@@ -66,5 +167,28 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setName("Circular Rendering")
                 .setIcon(Identifier.of("circular-rendering", "icon.png"))
                 .addPage(page);
+    }
+
+    private void updatePresetIfNeeded() {
+        if (applyingPreset) return;
+
+        ModConfig.Preset newPreset = null;
+
+        if (Math.abs(config.renderRadiusScale - 1.0) < 1e-6 && !config.enableVerticalRange) {
+            newPreset = ModConfig.Preset.BALANCED;
+        } else if (Math.abs(config.renderRadiusScale - 0.3) < 1e-6 && config.enableVerticalRange && config.verticalRange == 3) {
+            newPreset = ModConfig.Preset.AGGRESSIVE;
+        } else if (Math.abs(config.renderRadiusScale - 0.7) < 1e-6 && config.enableVerticalRange && config.verticalRange == 10) {
+            newPreset = ModConfig.Preset.PERFORMANCE;
+        } else {
+            newPreset = ModConfig.Preset.CUSTOM;
+        }
+
+        if (config.preset != newPreset) {
+            applyingPreset = true;
+            config.preset = newPreset;
+            config.save();
+            applyingPreset = false;
+        }
     }
 }

@@ -2,11 +2,20 @@
     "circular-rendering.options.title": "Circular Rendering",
     "circular-rendering.group.circle": "Horizontal Circle",
     "circular-rendering.group.vertical": "Vertical Range",
+    "circular-rendering.group.preset": "Preset",
+
     "circular-rendering.option.render_radius_scale": "Render Radius Scale",
     "circular-rendering.option.render_radius_scale.tooltip": "Scales the render radius (percentage). Lower values reduce the left/right radius, making culling more aggressive.",
     "circular-rendering.option.enable_vertical_range": "Enable Custom Vertical Range",
     "circular-rendering.option.enable_vertical_range.tooltip": "When enabled, the slider below limits vertical render layers.",
     "circular-rendering.option.vertical_range": "Vertical Range",
     "circular-rendering.option.vertical_range.tooltip": "Number of chunk layers (16 blocks each) to render above and below the player.",
-    "circular-rendering.option.vertical_range.unit": "layers"
+    "circular-rendering.option.vertical_range.unit": "layers",
+
+    "circular-rendering.option.preset": "Render Preset",
+    "circular-rendering.option.preset.tooltip": "Quickly switch between predefined configurations. Aggressiveness order: Aggressive (30% scale, 3 layers) > Performance (70% scale, 10 layers) > Balanced (100% scale, vanilla). Balanced presets also have optimization effects.",
+    "circular-rendering.preset.aggressive": "Aggressive",
+    "circular-rendering.preset.performance": "Performance",
+    "circular-rendering.preset.balanced": "Balanced",
+    "circular-rendering.preset.custom": "Custom"
 }

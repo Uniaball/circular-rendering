@@ -16,6 +16,14 @@ public class ModConfig {
     public double renderRadiusScale = 1.0;
     public boolean enableVerticalRange = false;
     public int verticalRange = 16;
+    public Preset preset = Preset.BALANCED;
+
+    public enum Preset {
+        AGGRESSIVE,
+        PERFORMANCE,
+        BALANCED,
+        CUSTOM
+    }
 
     public static ModConfig getInstance() {
         if (INSTANCE == null) {
