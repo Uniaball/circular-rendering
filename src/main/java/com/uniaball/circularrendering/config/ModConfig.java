@@ -17,12 +17,12 @@ public class ModConfig {
     public boolean enableVerticalRange = false;
     public int verticalRange = 16;
     public Preset preset = Preset.BALANCED;
+    public boolean customMode = false;
 
     public enum Preset {
         AGGRESSIVE,
         PERFORMANCE,
-        BALANCED,
-        CUSTOM
+        BALANCED
     }
 
     public static ModConfig getInstance() {

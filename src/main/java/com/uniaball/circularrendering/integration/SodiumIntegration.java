@@ -19,6 +19,29 @@ public class SodiumIntegration implements ConfigEntryPoint {
         OptionPageBuilder page = builder.createOptionPage();
         page.setName(Text.translatable("circular-rendering.options.title"));
 
+        OptionGroupBuilder modeGroup = builder.createOptionGroup();
+        modeGroup.setName(Text.translatable("circular-rendering.group.mode"));
+
+        Identifier customModeId = Identifier.of("circular-rendering", "custom_mode");
+        modeGroup.addOption(builder.createBooleanOption(customModeId)
+                .setName(Text.translatable("circular-rendering.option.custom_mode"))
+                .setTooltip(Text.translatable("circular-rendering.option.custom_mode.tooltip"))
+                .setStorageHandler(config::save)
+                .setBinding(
+                        (Boolean value) -> {
+                            boolean old = config.customMode;
+                            config.customMode = value;
+                            if (old && !value) {
+                                applyMatchingPreset();
+                            }
+                            config.save();
+                        },
+                        () -> config.customMode
+                )
+                .setDefaultValue(false)
+        );
+        page.addOptionGroup(modeGroup);
+
         OptionGroupBuilder presetGroup = builder.createOptionGroup();
         presetGroup.setName(Text.translatable("circular-rendering.group.preset"));
 
@@ -36,31 +59,14 @@ public class SodiumIntegration implements ConfigEntryPoint {
                             }
                             applyingPreset = true;
                             config.preset = value;
-                            switch (value) {
-                                case AGGRESSIVE:
-                                    config.renderRadiusScale = 0.3;
-                                    config.enableVerticalRange = true;
-                                    config.verticalRange = 3;
-                                    break;
-                                case PERFORMANCE:
-                                    config.renderRadiusScale = 0.7;
-                                    config.enableVerticalRange = true;
-                                    config.verticalRange = 10;
-                                    break;
-                                case BALANCED:
-                                    config.renderRadiusScale = 1.0;
-                                    config.enableVerticalRange = false;
-                                    config.verticalRange = 16;
-                                    break;
-                                case CUSTOM:
-                                    break;
-                            }
+                            applyPreset(value);
                             config.save();
                             applyingPreset = false;
                         },
                         () -> config.preset
                 )
                 .setDefaultValue(ModConfig.Preset.BALANCED)
+                .setEnabledProvider(state -> !state.readBooleanOption(customModeId), customModeId)
                 .setElementNameProvider(preset -> {
                     Text name;
                     switch (preset) {
@@ -75,10 +81,6 @@ public class SodiumIntegration implements ConfigEntryPoint {
                         case BALANCED:
                             name = Text.translatable("circular-rendering.preset.balanced")
                                     .copy().formatted(Formatting.GREEN);
-                            break;
-                        case CUSTOM:
-                            name = Text.translatable("circular-rendering.preset.custom")
-                                    .copy().formatted(Formatting.GRAY);
                             break;
                         default:
                             name = Text.literal(preset.name());
@@ -99,17 +101,15 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setBinding(
                         (Integer value) -> {
                             double newScale = value / 100.0;
-                            if (applyingPreset) {
-                                config.renderRadiusScale = newScale;
-                                config.save();
-                                return;
-                            }
                             config.renderRadiusScale = newScale;
-                            updatePresetIfNeeded();
+                            if (config.customMode) {
+                                updatePresetIfNeeded();
+                            }
                             config.save();
                         },
                         () -> (int) Math.round(config.renderRadiusScale * 100)
                 )
+                .setEnabledProvider(state -> state.readBooleanOption(customModeId), customModeId)
                 .setDefaultValue(100)
                 .setValueFormatter(v -> Text.literal(v + "%"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
@@ -125,17 +125,15 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setStorageHandler(config::save)
                 .setBinding(
                         (Boolean value) -> {
-                            if (applyingPreset) {
-                                config.enableVerticalRange = value;
-                                config.save();
-                                return;
-                            }
                             config.enableVerticalRange = value;
-                            updatePresetIfNeeded();
+                            if (config.customMode) {
+                                updatePresetIfNeeded();
+                            }
                             config.save();
                         },
                         () -> config.enableVerticalRange
                 )
+                .setEnabledProvider(state -> state.readBooleanOption(customModeId), customModeId)
                 .setDefaultValue(false));
 
         verticalGroup.addOption(builder.createIntegerOption(Identifier.of("circular-rendering", "vertical_range"))
@@ -145,20 +143,17 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setStorageHandler(config::save)
                 .setBinding(
                         (Integer value) -> {
-                            if (applyingPreset) {
-                                config.verticalRange = value;
-                                config.save();
-                                return;
-                            }
                             config.verticalRange = value;
-                            updatePresetIfNeeded();
+                            if (config.customMode) {
+                                updatePresetIfNeeded();
+                            }
                             config.save();
                         },
                         () -> config.verticalRange
                 )
+                .setEnabledProvider(state -> state.readBooleanOption(enableId) && state.readBooleanOption(customModeId), enableId, customModeId)
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
-                .setEnabledProvider(state -> state.readBooleanOption(enableId), enableId)
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         page.addOptionGroup(verticalGroup);
 
@@ -168,26 +163,58 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .addPage(page);
     }
 
-    private void updatePresetIfNeeded() {
-        if (applyingPreset) return;
-
-        ModConfig.Preset newPreset = null;
-
-        if (Math.abs(config.renderRadiusScale - 1.0) < 1e-6 && !config.enableVerticalRange) {
-            newPreset = ModConfig.Preset.BALANCED;
-        } else if (Math.abs(config.renderRadiusScale - 0.3) < 1e-6 && config.enableVerticalRange && config.verticalRange == 3) {
-            newPreset = ModConfig.Preset.AGGRESSIVE;
-        } else if (Math.abs(config.renderRadiusScale - 0.7) < 1e-6 && config.enableVerticalRange && config.verticalRange == 10) {
-            newPreset = ModConfig.Preset.PERFORMANCE;
-        } else {
-            newPreset = ModConfig.Preset.CUSTOM;
+    private void applyPreset(ModConfig.Preset preset) {
+        switch (preset) {
+            case AGGRESSIVE:
+                config.renderRadiusScale = 0.3;
+                config.enableVerticalRange = true;
+                config.verticalRange = 3;
+                break;
+            case PERFORMANCE:
+                config.renderRadiusScale = 0.7;
+                config.enableVerticalRange = true;
+                config.verticalRange = 10;
+                break;
+            case BALANCED:
+                config.renderRadiusScale = 1.0;
+                config.enableVerticalRange = false;
+                config.verticalRange = 16;
+                break;
         }
+    }
 
-        if (config.preset != newPreset) {
+    private void applyMatchingPreset() {
+        ModConfig.Preset matched = getMatchingPreset();
+        if (matched != null) {
             applyingPreset = true;
-            config.preset = newPreset;
-            config.save();
+            config.preset = matched;
+            applyPreset(matched);
             applyingPreset = false;
+        } else {
+            applyingPreset = true;
+            config.preset = ModConfig.Preset.BALANCED;
+            applyPreset(ModConfig.Preset.BALANCED);
+            applyingPreset = false;
+        }
+    }
+
+    private ModConfig.Preset getMatchingPreset() {
+        if (Math.abs(config.renderRadiusScale - 1.0) < 1e-6 && !config.enableVerticalRange) {
+            return ModConfig.Preset.BALANCED;
+        } else if (Math.abs(config.renderRadiusScale - 0.3) < 1e-6 && config.enableVerticalRange && config.verticalRange == 3) {
+            return ModConfig.Preset.AGGRESSIVE;
+        } else if (Math.abs(config.renderRadiusScale - 0.7) < 1e-6 && config.enableVerticalRange && config.verticalRange == 10) {
+            return ModConfig.Preset.PERFORMANCE;
+        }
+        return null;
+    }
+
+    private void updatePresetIfNeeded() {
+        if (!config.customMode) return;
+        ModConfig.Preset matched = getMatchingPreset();
+        if (matched != null && config.preset != matched) {
+            config.preset = matched;
+            config.save();
         }
     }
 }
