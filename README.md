@@ -64,7 +64,7 @@ Selecting a preset automatically applies its parameters.
 The mod creates a JSON config file at `config/circular-rendering.json`.  
 Example content:
 
-````json
+```json
 {
   "renderRadiusScale": 1.0,
   "enableVerticalRange": false,
@@ -72,7 +72,7 @@ Example content:
   "preset": "BALANCED",
   "customMode": false
 }
-````
+```
 
 - `renderRadiusScale` – a double between 0.1 and 1.0.  
   - `1.0` = perfect circle.  
@@ -89,9 +89,9 @@ Changes take effect after restarting the game or reloading chunks.
 ## How It Works
 
 - **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list using the shape defined by:
-  ````
+  ```
   (forward² / a²) + (right² / b²) ≤ 1
-  ````
+  ```
   where `a = view distance × 16` (fixed forward/backward radius) and `b = a × renderRadiusScale` (left/right radius).  
   When `b = a`, the shape is a circle. If vertical range is enabled, it also checks chunk Y layers.
 - **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside this shape or vertical range.
@@ -108,9 +108,9 @@ Both approaches only affect chunk rendering; chunk loading remains square, so ga
 
 Clone the repository and run:
 
-````bash
+```bash
 ./gradlew build
-````
+```
 
 The built JAR will be in `build/libs/`.
 
