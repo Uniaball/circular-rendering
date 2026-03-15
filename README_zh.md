@@ -89,9 +89,9 @@
 ## 工作原理
 
 - **原版模式（无 Sodium）：** 模组注入 `WorldRenderer.renderBlockLayers` 方法，过滤区块列表，保留符合以下形状的区块：
-  ````
+  ```
   (forward² / a²) + (right² / b²) ≤ 1
-  ````
+  ```
   其中 `a = 视距 × 16`（固定前后半径），`b = a × renderRadiusScale`（左右半径）。  
   当 `b = a` 时，形状为正圆。若启用了垂直范围，还会检查区块 Y 层。
 - **Sodium 模式：** 模组注入 Sodium 的 `OcclusionCuller.isWithinRenderDistance` 方法，对形状外或超出垂直范围的区块返回 `false`。
@@ -108,9 +108,9 @@
 
 克隆仓库后运行：
 
-````bash
+```bash
 ./gradlew build
-````
+```
 
 构建的 JAR 文件位于 `build/libs/`。
 
