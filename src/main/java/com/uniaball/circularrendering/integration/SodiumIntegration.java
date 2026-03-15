@@ -166,12 +166,12 @@ public class SodiumIntegration implements ConfigEntryPoint {
     private void applyPreset(ModConfig.Preset preset) {
         switch (preset) {
             case AGGRESSIVE:
-                config.renderRadiusScale = 0.3;
+                config.renderRadiusScale = 0.4;
                 config.enableVerticalRange = true;
                 config.verticalRange = 3;
                 break;
             case PERFORMANCE:
-                config.renderRadiusScale = 0.7;
+                config.renderRadiusScale = 0.8;
                 config.enableVerticalRange = true;
                 config.verticalRange = 10;
                 break;
