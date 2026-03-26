@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.uniaball.circularrendering.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "plugin": "com.uniaball.circularrendering.mixin.CircularRenderingMixinPlugin",
   "client": [
     "WorldRendererMixin",

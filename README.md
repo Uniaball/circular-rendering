@@ -100,7 +100,7 @@ Both approaches only affect chunk rendering; chunk loading remains square, so ga
 
 ## Compatibility
 
-- Works with Minecraft 1.21.11.
+- Works with Minecraft 1.21.11/26.1.
 - Fully compatible with Sodium 0.8.6+ (both mods can be used together).
 - Should be compatible with most other mods that don't heavily modify chunk rendering. If you encounter issues, please report them.
 
