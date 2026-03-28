@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +31,7 @@ public class LevelRendererMixin {
 
         ModConfig config = ModConfig.getInstance();
 
-        int viewDistance = client.options.getViewDistance().getValue();
+        int viewDistance = client.options.renderDistance().get();
         double maxRadius = viewDistance * 16.0;
         double scale = config.renderRadiusScale;
         double shortRadius = maxRadius * scale;
@@ -43,9 +42,9 @@ public class LevelRendererMixin {
 
         double playerX = player.getX();
         double playerZ = player.getZ();
-        float yawRad = player.getYaw() * Mth.RADIANS_PER_DEGREE;
-        double dirX = -Mth.sin(yawRad);
-        double dirZ = Mth.cos(yawRad);
+        double yawRad = player.getYRot() * (Math.PI / 180.0);
+        double dirX = -Math.sin(yawRad);
+        double dirZ = Math.cos(yawRad);
 
         boolean verticalEnabled = config.enableVerticalRange;
         int verticalRange = config.verticalRange;

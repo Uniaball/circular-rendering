@@ -6,7 +6,6 @@ import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.CameraTransform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +22,7 @@ public class SodiumOcclusionCullerMixin {
 
         ModConfig config = ModConfig.getInstance();
 
-        int viewDistance = client.options.getViewDistance().getValue();
+        int viewDistance = client.options.renderDistance().get();
         double maxRadius = viewDistance * 16.0;
         double scale = config.renderRadiusScale;
         double shortRadius = maxRadius * scale;
@@ -39,9 +38,9 @@ public class SodiumOcclusionCullerMixin {
         double dx = centerX - player.getX();
         double dz = centerZ - player.getZ();
 
-        float yawRad = player.getYaw() * Mth.RADIANS_PER_DEGREE;
-        double dirX = -Mth.sin(yawRad);
-        double dirZ = Mth.cos(yawRad);
+        double yawRad = player.getYRot() * (Math.PI / 180.0);
+        double dirX = -Math.sin(yawRad);
+        double dirZ = Math.cos(yawRad);
 
         double forward = dx * dirX + dz * dirZ;
         double right   = -dx * dirZ + dz * dirX;
