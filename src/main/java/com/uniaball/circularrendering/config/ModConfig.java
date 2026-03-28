@@ -33,16 +33,64 @@ public class ModConfig {
     }
 
     private static ModConfig load() {
+        ModConfig config;
         if (Files.exists(CONFIG_PATH)) {
             try (var reader = Files.newBufferedReader(CONFIG_PATH)) {
-                return GSON.fromJson(reader, ModConfig.class);
+                config = GSON.fromJson(reader, ModConfig.class);
             } catch (IOException e) {
                 e.printStackTrace();
+                config = new ModConfig();
+            }
+        } else {
+            config = new ModConfig();
+        }
+
+        config.syncFieldsFromPreset();
+        config.save();
+
+        return config;
+    }
+
+    private void syncFieldsFromPreset() {
+        if (!customMode) {
+            applyPreset(preset);
+        } else {
+            Preset matched = getMatchingPreset();
+            if (matched != null && matched != preset) {
+                preset = matched;
             }
         }
-        ModConfig config = new ModConfig();
-        config.save();
-        return config;
+    }
+
+    private void applyPreset(Preset preset) {
+        switch (preset) {
+            case AGGRESSIVE:
+                renderRadiusScale = 0.4;
+                enableVerticalRange = true;
+                verticalRange = 3;
+                break;
+            case PERFORMANCE:
+                renderRadiusScale = 0.8;
+                enableVerticalRange = true;
+                verticalRange = 10;
+                break;
+            case BALANCED:
+                renderRadiusScale = 1.0;
+                enableVerticalRange = false;
+                verticalRange = 16;
+                break;
+        }
+    }
+
+    private Preset getMatchingPreset() {
+        if (Math.abs(renderRadiusScale - 1.0) < 1e-6 && !enableVerticalRange) {
+            return Preset.BALANCED;
+        } else if (Math.abs(renderRadiusScale - 0.4) < 1e-6 && enableVerticalRange && verticalRange == 3) {
+            return Preset.AGGRESSIVE;
+        } else if (Math.abs(renderRadiusScale - 0.8) < 1e-6 && enableVerticalRange && verticalRange == 10) {
+            return Preset.PERFORMANCE;
+        }
+        return null;
     }
 
     public void save() {
