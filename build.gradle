@@ -19,9 +19,9 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	
-    modCompileOnly "net.caffeinemc:sodium-fabric:${sodium_version}"
+    compileOnly "net.caffeinemc:sodium-fabric:${sodium_version}"
 }
 
 processResources {
