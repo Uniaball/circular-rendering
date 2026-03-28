@@ -5,7 +5,7 @@
   "compatibilityLevel": "JAVA_25",
   "plugin": "com.uniaball.circularrendering.mixin.CircularRenderingMixinPlugin",
   "client": [
-    "WorldRendererMixin",
+    "LevelRendererMixin",
     "SodiumOcclusionCullerMixin"
   ],
   "injectors": {

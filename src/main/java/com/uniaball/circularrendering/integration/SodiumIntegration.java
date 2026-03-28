@@ -6,9 +6,9 @@ import net.caffeinemc.mods.sodium.api.config.option.OptionFlag;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionGroupBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionPageBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
 public class SodiumIntegration implements ConfigEntryPoint {
     private final ModConfig config = ModConfig.getInstance();
@@ -17,15 +17,15 @@ public class SodiumIntegration implements ConfigEntryPoint {
     @Override
     public void registerConfigLate(ConfigBuilder builder) {
         OptionPageBuilder page = builder.createOptionPage();
-        page.setName(Text.translatable("circular-rendering.options.title"));
+        page.setName(Component.translatable("circular-rendering.options.title"));
 
         OptionGroupBuilder modeGroup = builder.createOptionGroup();
-        modeGroup.setName(Text.translatable("circular-rendering.group.mode"));
+        modeGroup.setName(Component.translatable("circular-rendering.group.mode"));
 
-        Identifier customModeId = Identifier.of("circular-rendering", "custom_mode");
+        Identifier customModeId = Identifier.parse("circular-rendering:custom_mode");
         modeGroup.addOption(builder.createBooleanOption(customModeId)
-                .setName(Text.translatable("circular-rendering.option.custom_mode"))
-                .setTooltip(Text.translatable("circular-rendering.option.custom_mode.tooltip"))
+                .setName(Component.translatable("circular-rendering.option.custom_mode"))
+                .setTooltip(Component.translatable("circular-rendering.option.custom_mode.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
                         (Boolean value) -> {
@@ -43,12 +43,12 @@ public class SodiumIntegration implements ConfigEntryPoint {
         page.addOptionGroup(modeGroup);
 
         OptionGroupBuilder presetGroup = builder.createOptionGroup();
-        presetGroup.setName(Text.translatable("circular-rendering.group.preset"));
+        presetGroup.setName(Component.translatable("circular-rendering.group.preset"));
 
-        Identifier presetId = Identifier.of("circular-rendering", "preset");
+        Identifier presetId = Identifier.parse("circular-rendering:preset");
         presetGroup.addOption(builder.createEnumOption(presetId, ModConfig.Preset.class)
-                .setName(Text.translatable("circular-rendering.option.preset"))
-                .setTooltip(Text.translatable("circular-rendering.option.preset.tooltip"))
+                .setName(Component.translatable("circular-rendering.option.preset"))
+                .setTooltip(Component.translatable("circular-rendering.option.preset.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
                         (ModConfig.Preset value) -> {
@@ -68,22 +68,22 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setDefaultValue(ModConfig.Preset.BALANCED)
                 .setEnabledProvider(state -> !state.readBooleanOption(customModeId), customModeId)
                 .setElementNameProvider(preset -> {
-                    Text name;
+                    Component name;
                     switch (preset) {
                         case AGGRESSIVE:
-                            name = Text.translatable("circular-rendering.preset.aggressive")
-                                    .copy().formatted(Formatting.RED);
+                            name = Component.translatable("circular-rendering.preset.aggressive")
+                                    .copy().withStyle(ChatFormatting.RED);
                             break;
                         case PERFORMANCE:
-                            name = Text.translatable("circular-rendering.preset.performance")
-                                    .copy().formatted(Formatting.GOLD);
+                            name = Component.translatable("circular-rendering.preset.performance")
+                                    .copy().withStyle(ChatFormatting.GOLD);
                             break;
                         case BALANCED:
-                            name = Text.translatable("circular-rendering.preset.balanced")
-                                    .copy().formatted(Formatting.GREEN);
+                            name = Component.translatable("circular-rendering.preset.balanced")
+                                    .copy().withStyle(ChatFormatting.GREEN);
                             break;
                         default:
-                            name = Text.literal(preset.name());
+                            name = Component.literal(preset.name());
                     }
                     return name;
                 })
@@ -92,10 +92,10 @@ public class SodiumIntegration implements ConfigEntryPoint {
         page.addOptionGroup(presetGroup);
 
         OptionGroupBuilder circleGroup = builder.createOptionGroup();
-        circleGroup.setName(Text.translatable("circular-rendering.group.circle"));
-        circleGroup.addOption(builder.createIntegerOption(Identifier.of("circular-rendering", "render_radius_scale"))
-                .setName(Text.translatable("circular-rendering.option.render_radius_scale"))
-                .setTooltip(Text.translatable("circular-rendering.option.render_radius_scale.tooltip"))
+        circleGroup.setName(Component.translatable("circular-rendering.group.circle"));
+        circleGroup.addOption(builder.createIntegerOption(Identifier.parse("circular-rendering:render_radius_scale"))
+                .setName(Component.translatable("circular-rendering.option.render_radius_scale"))
+                .setTooltip(Component.translatable("circular-rendering.option.render_radius_scale.tooltip"))
                 .setRange(10, 100, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
@@ -111,17 +111,17 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setEnabledProvider(state -> state.readBooleanOption(customModeId), customModeId)
                 .setDefaultValue(100)
-                .setValueFormatter(v -> Text.literal(v + "%"))
+                .setValueFormatter(v -> Component.literal(v + "%"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         page.addOptionGroup(circleGroup);
 
-        Identifier enableId = Identifier.of("circular-rendering", "enable_vertical_range");
+        Identifier enableId = Identifier.parse("circular-rendering:enable_vertical_range");
         OptionGroupBuilder verticalGroup = builder.createOptionGroup();
-        verticalGroup.setName(Text.translatable("circular-rendering.group.vertical"));
+        verticalGroup.setName(Component.translatable("circular-rendering.group.vertical"));
 
         verticalGroup.addOption(builder.createBooleanOption(enableId)
-                .setName(Text.translatable("circular-rendering.option.enable_vertical_range"))
-                .setTooltip(Text.translatable("circular-rendering.option.enable_vertical_range.tooltip"))
+                .setName(Component.translatable("circular-rendering.option.enable_vertical_range"))
+                .setTooltip(Component.translatable("circular-rendering.option.enable_vertical_range.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
                         (Boolean value) -> {
@@ -136,9 +136,9 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setEnabledProvider(state -> state.readBooleanOption(customModeId), customModeId)
                 .setDefaultValue(false));
 
-        verticalGroup.addOption(builder.createIntegerOption(Identifier.of("circular-rendering", "vertical_range"))
-                .setName(Text.translatable("circular-rendering.option.vertical_range"))
-                .setTooltip(Text.translatable("circular-rendering.option.vertical_range.tooltip"))
+        verticalGroup.addOption(builder.createIntegerOption(Identifier.parse("circular-rendering:vertical_range"))
+                .setName(Component.translatable("circular-rendering.option.vertical_range"))
+                .setTooltip(Component.translatable("circular-rendering.option.vertical_range.tooltip"))
                 .setRange(1, 32, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
@@ -153,13 +153,13 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 )
                 .setEnabledProvider(state -> state.readBooleanOption(enableId) && state.readBooleanOption(customModeId), enableId, customModeId)
                 .setDefaultValue(16)
-                .setValueFormatter(v -> Text.literal(v + " " + Text.translatable("circular-rendering.option.vertical_range.unit").getString()))
+                .setValueFormatter(v -> Component.literal(v + " " + Component.translatable("circular-rendering.option.vertical_range.unit").getString()))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
         page.addOptionGroup(verticalGroup);
 
         builder.registerOwnModOptions()
                 .setName("Circular Rendering")
-                .setIcon(Identifier.of("circular-rendering", "icon.png"))
+                .setIcon(Identifier.parse("circular-rendering:icon.png"))
                 .addPage(page);
     }
 

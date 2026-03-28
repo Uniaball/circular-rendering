@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public class CircularRenderingMixinPlugin implements IMixinConfigPlugin {
-    private static final String VANILLA_MIXIN = "com.uniaball.circularrendering.mixin.WorldRendererMixin";
+    private static final String VANILLA_MIXIN = "com.uniaball.circularrendering.mixin.LevelRendererMixin";
     private static final String SODIUM_MIXIN = "com.uniaball.circularrendering.mixin.SodiumOcclusionCullerMixin";
 
     @Override

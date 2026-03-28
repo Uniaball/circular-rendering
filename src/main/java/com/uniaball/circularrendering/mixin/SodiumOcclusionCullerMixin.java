@@ -4,9 +4,9 @@ import com.uniaball.circularrendering.config.ModConfig;
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.CameraTransform;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,8 +17,8 @@ public class SodiumOcclusionCullerMixin {
 
     @Inject(method = "isWithinRenderDistance", at = @At("HEAD"), cancellable = true, remap = false)
     private static void onIsWithinRenderDistance(CameraTransform camera, RenderSection section, float searchDistance, CallbackInfoReturnable<Boolean> cir) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        ClientPlayerEntity player = client.player;
+        Minecraft client = Minecraft.getInstance();
+        LocalPlayer player = client.player;
         if (player == null) return;
 
         ModConfig config = ModConfig.getInstance();
@@ -39,9 +39,9 @@ public class SodiumOcclusionCullerMixin {
         double dx = centerX - player.getX();
         double dz = centerZ - player.getZ();
 
-        float yawRad = player.getYaw() * MathHelper.RADIANS_PER_DEGREE;
-        double dirX = -MathHelper.sin(yawRad);
-        double dirZ = MathHelper.cos(yawRad);
+        float yawRad = player.getYaw() * Mth.RADIANS_PER_DEGREE;
+        double dirX = -Mth.sin(yawRad);
+        double dirZ = Mth.cos(yawRad);
 
         double forward = dx * dirX + dz * dirZ;
         double right   = -dx * dirZ + dz * dirX;
