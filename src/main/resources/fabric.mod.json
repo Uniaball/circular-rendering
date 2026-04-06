@@ -29,5 +29,8 @@
 		"fabricloader": ">=0.18.5",
 		"minecraft": "~26.1",
 		"java": ">=25"
-	}
+	},
+    "recommends": {
+        "sodium": ">=0.8.7"
+    }
 }
