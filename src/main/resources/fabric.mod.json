@@ -1,36 +1,36 @@
 {
-	"schemaVersion": 1,
-	"id": "circular-rendering",
-	"version": "${version}",
-	"name": "Circular Rendering",
-	"description": "A mod that changes the vanilla rendering method to 3D spherical rendering",
-	"authors": [
-		"Uniaball"
-	],
-	"contact": {
-		"homepage": "https://github.com/Uniaball/circular-rendering",
-		"sources": "https://github.com/Uniaball/circular-rendering"
-	},
-	"license": "MIT",
-	"icon": "assets/circular-rendering/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.uniaball.circularrendering.CircularRenderingMod"
-		],
-		"sodium:config_api_user": [
-			"com.uniaball.circularrendering.integration.SodiumIntegration"
-		]
-	},
-	"mixins": [
-		"circular-rendering.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.18.5",
-		"minecraft": "~26.1",
-		"java": ">=25"
-	},
-    "recommends": {
-        "sodium": ">=0.8.7"
-    }
+        "schemaVersion": 1,
+        "id": "circular-rendering",
+        "version": "${version}",
+        "name": "Circular Rendering",
+        "description": "A mod that changes the vanilla rendering method to 3D spherical rendering",
+        "authors": [
+                "Uniaball"
+        ],
+        "contact": {
+                "homepage": "https://github.com/Uniaball/circular-rendering",
+                "sources": "https://github.com/Uniaball/circular-rendering"
+        },
+        "license": "MIT",
+        "icon": "assets/circular-rendering/icon.png",
+        "environment": "*",
+        "entrypoints": {
+                "main": [
+                        "com.uniaball.circularrendering.CircularRenderingMod"
+                ],
+                "sodium:config_api_user": [
+                        "com.uniaball.circularrendering.integration.SodiumIntegration"
+                ]
+        },
+        "mixins": [
+                "circular-rendering.mixins.json"
+        ],
+        "depends": {
+                "fabricloader": ">=0.18.5",
+                "minecraft": "~26.1",
+                "java": ">=25"
+        },
+        "recommends": {
+                "sodium": ">=0.8.7"
+        }
 }
