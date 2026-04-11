@@ -102,6 +102,7 @@ Both approaches only affect chunk rendering; chunk loading remains square, so ga
 
 - Works with Minecraft:
 ```
+26.1.2
 26.1.1
 26.1
 1.21.11
