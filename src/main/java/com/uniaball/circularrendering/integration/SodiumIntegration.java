@@ -201,9 +201,9 @@ public class SodiumIntegration implements ConfigEntryPoint {
     private ModConfig.Preset getMatchingPreset() {
         if (Math.abs(config.renderRadiusScale - 1.0) < 1e-6 && !config.enableVerticalRange) {
             return ModConfig.Preset.BALANCED;
-        } else if (Math.abs(config.renderRadiusScale - 0.3) < 1e-6 && config.enableVerticalRange && config.verticalRange == 3) {
+        } else if (Math.abs(config.renderRadiusScale - 0.4) < 1e-6 && config.enableVerticalRange && config.verticalRange == 3) {
             return ModConfig.Preset.AGGRESSIVE;
-        } else if (Math.abs(config.renderRadiusScale - 0.7) < 1e-6 && config.enableVerticalRange && config.verticalRange == 10) {
+        } else if (Math.abs(config.renderRadiusScale - 0.8) < 1e-6 && config.enableVerticalRange && config.verticalRange == 10) {
             return ModConfig.Preset.PERFORMANCE;
         }
         return null;

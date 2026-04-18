@@ -19,6 +19,12 @@ import java.util.List;
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
 
+    private int lastViewDistance = -1;
+    private double lastScale = -1.0;
+    private double cachedA2 = 0;
+    private double cachedB2 = 0;
+    private double cachedAB2 = 0;
+
     @Redirect(
         method = "renderBlockLayers",
         at = @At(
@@ -43,13 +49,17 @@ public class WorldRendererMixin {
         ModConfig config = ModConfig.getInstance();
 
         int viewDistance = client.options.getViewDistance().getValue();
-        double maxRadius = viewDistance * 16.0;
         double scale = config.renderRadiusScale;
-        double shortRadius = maxRadius * scale;
 
-        double a2 = maxRadius * maxRadius;
-        double b2 = shortRadius * shortRadius;
-        double ab2 = a2 * b2;
+        if (viewDistance != lastViewDistance || scale != lastScale) {
+            lastViewDistance = viewDistance;
+            lastScale = scale;
+            double maxRadius = viewDistance * 16.0;
+            cachedA2 = maxRadius * maxRadius;
+            double shortRadius = maxRadius * scale;
+            cachedB2 = shortRadius * shortRadius;
+            cachedAB2 = cachedA2 * cachedB2;
+        }
 
         double playerX = player.getX();
         double playerZ = player.getZ();
@@ -72,7 +82,7 @@ public class WorldRendererMixin {
             double forward = dx * dirX + dz * dirZ;
             double right   = -dx * dirZ + dz * dirX;
 
-            if (forward * forward * b2 + right * right * a2 > ab2) {
+            if (forward * forward * cachedB2 + right * right * cachedA2 > cachedAB2) {
                 continue;
             }
 

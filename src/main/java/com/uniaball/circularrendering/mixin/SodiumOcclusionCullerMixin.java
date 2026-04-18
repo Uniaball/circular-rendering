@@ -15,6 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = OcclusionCuller.class, remap = false)
 public class SodiumOcclusionCullerMixin {
 
+    private static int lastViewDistance = -1;
+    private static double lastScale = -1.0;
+    private static double cachedA2 = 0;
+    private static double cachedB2 = 0;
+    private static double cachedAB2 = 0;
+
     @Inject(method = "isWithinRenderDistance", at = @At("HEAD"), cancellable = true, remap = false)
     private static void onIsWithinRenderDistance(CameraTransform camera, RenderSection section, float searchDistance, CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -24,13 +30,17 @@ public class SodiumOcclusionCullerMixin {
         ModConfig config = ModConfig.getInstance();
 
         int viewDistance = client.options.getViewDistance().getValue();
-        double maxRadius = viewDistance * 16.0;
         double scale = config.renderRadiusScale;
-        double shortRadius = maxRadius * scale;
 
-        double a2 = maxRadius * maxRadius;
-        double b2 = shortRadius * shortRadius;
-        double ab2 = a2 * b2;
+        if (viewDistance != lastViewDistance || scale != lastScale) {
+            lastViewDistance = viewDistance;
+            lastScale = scale;
+            double maxRadius = viewDistance * 16.0;
+            cachedA2 = maxRadius * maxRadius;
+            double shortRadius = maxRadius * scale;
+            cachedB2 = shortRadius * shortRadius;
+            cachedAB2 = cachedA2 * cachedB2;
+        }
 
         int originX = section.getOriginX();
         int originZ = section.getOriginZ();
@@ -46,7 +56,7 @@ public class SodiumOcclusionCullerMixin {
         double forward = dx * dirX + dz * dirZ;
         double right   = -dx * dirZ + dz * dirX;
 
-        if (forward * forward * b2 + right * right * a2 > ab2) {
+        if (forward * forward * cachedB2 + right * right * cachedA2 > cachedAB2) {
             cir.setReturnValue(false);
             return;
         }

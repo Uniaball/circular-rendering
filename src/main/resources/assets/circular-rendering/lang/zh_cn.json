@@ -9,7 +9,7 @@
     "circular-rendering.option.custom_mode.tooltip": "开启后，您可以自由调整所有参数，预设被禁用。关闭后，只能选择预设，其他选项将被锁定。",
 
     "circular-rendering.option.preset": "渲染预设",
-    "circular-rendering.option.preset.tooltip": "快速切换预定义的配置组合。激进程度顺序：激进（30%缩放，3层）> 性能（70%缩放，10层）> 平衡（100%缩放，原版）。平衡预设同样有优化效果。",
+    "circular-rendering.option.preset.tooltip": "快速切换预定义的配置组合。激进程度顺序：激进（40%缩放，3层）> 性能（80%缩放，10层）> 平衡（100%缩放，原版）。平衡预设同样有优化效果。",
 
     "circular-rendering.option.render_radius_scale": "渲染半径缩放",
     "circular-rendering.option.render_radius_scale.tooltip": "缩放渲染圆形的半径（百分比）。值越小，左右半径越小，剔除越激进。",
