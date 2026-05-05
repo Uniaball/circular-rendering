@@ -22,9 +22,9 @@ public class ModConfig {
     public Preset preset = Preset.BALANCED;
 
     public enum Preset {
-        AGGRESSIVE,
-        PERFORMANCE,
         BALANCED,
+        PERFORMANCE,
+        AGGRESSIVE,
         CUSTOM
     }
 

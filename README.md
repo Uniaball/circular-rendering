@@ -14,9 +14,9 @@ You can optionally scale the left/right radius to create an ellipse, culling mor
   - When `renderRadiusScale < 1.0`, it becomes an ellipse (narrower left/right).
 - Optional vertical range limitation: limit rendering to a certain number of chunk layers above and below the player.
 - Chunk loading (logic updates) remains square, so all chunks are still loaded and updated.
-- Presets & Custom Mode (Sodium only): Quickly switch between predefined configurations (Aggressive, Performance, Balanced) or unlock full control with Custom Mode.
+- Presets & Custom Mode: Quickly switch between predefined configurations (Balanced, Performance, Aggressive) or choose **Custom** to freely adjust all parameters.
 - Compatible with Sodium:
-  - When Sodium is present, configuration sliders and presets appear in the Video Settings screen.
+  - When Sodium is present, configuration appears in the Video Settings screen.
   - Without Sodium, the mod works standalone using a JSON config file.
 - No effect on entities or other objects – only chunk rendering is affected.
 
@@ -24,6 +24,7 @@ You can optionally scale the left/right radius to create an ellipse, culling mor
 
 - **Required:** [Fabric Loader](https://fabricmc.net/) ≥0.18.4
 - **Optional:** [Sodium](https://modrinth.com/mod/sodium) 0.8.6+ (for in-game GUI configuration)
+- **Optional:** [Super Fast Math](https://modrinth.com/mod/superfastmath) any version (for faster math)
 
 ## Installation
 
@@ -39,20 +40,16 @@ You can optionally scale the left/right radius to create an ellipse, culling mor
 1. Go to **Options → Video Settings**.
 2. Scroll down to find the **Circular Rendering** section.
 
-#### Configuration Mode
-- **Enable Custom Configuration** (toggle):  
-  - **OFF (default)**: You can only choose from three presets (Aggressive, Performance, Balanced). All other sliders are locked.  
-  - **ON**: Presets are disabled, and you can freely adjust the sliders below (`Render Radius Scale`, `Enable Custom Vertical Range`, `Vertical Range`).
+#### Presets
+- **Render Preset** dropdown:
+  - **Balanced**: `Render Radius Scale = 100%`, vertical range disabled (vanilla behavior, but still optimized).
+  - **Performance**: `Render Radius Scale = 80%`, vertical range enabled, 10 layers.
+  - **Aggressive**: `Render Radius Scale = 40%`, vertical range enabled, 3 layers.
+  - **Custom**: All sliders become unlocked, allowing you to freely adjust the parameters below.
 
-#### Presets (available only when Custom Mode is OFF)
-- **Render Preset** dropdown:  
-  - **Aggressive**: `Render Radius Scale = 40%`, vertical range enabled, 3 layers.  
-  - **Performance**: `Render Radius Scale = 80%`, vertical range enabled, 10 layers.  
-  - **Balanced**: `Render Radius Scale = 100%`, vertical range disabled (vanilla behavior, but still optimized).  
+Selecting a non‑Custom preset automatically applies its parameters and locks the manual controls.
 
-Selecting a preset automatically applies its parameters.
-
-#### Manual Configurations (available only when Custom Mode is ON)
+#### Manual Configurations (available only when “Custom” preset is selected)
 - **Render Radius Scale** (10% – 100%):  
   - **100%** = perfect circle (radius = view distance × 16).  
   - **Lower values** make the left/right radius smaller, turning the circle into an ellipse and culling more chunks to the sides.
@@ -69,8 +66,7 @@ Example content:
   "renderRadiusScale": 1.0,
   "enableVerticalRange": false,
   "verticalRange": 16,
-  "preset": "BALANCED",
-  "customMode": false
+  "preset": "BALANCED"
 }
 ```
 
@@ -79,10 +75,9 @@ Example content:
   - `< 1.0` = ellipse (narrower left/right).  
 - `enableVerticalRange` – a boolean, enables vertical range limiting when true.  
 - `verticalRange` – an integer (1–32), number of chunk layers to render above and below the player (each layer = 16 blocks).  
-- `preset` – one of `"AGGRESSIVE"`, `"PERFORMANCE"`, `"BALANCED"`. This field is only used when `customMode` is `false`.  
-- `customMode` – a boolean:  
-  - `false` (default): The configuration is controlled by the `preset` field; the other three fields are ignored.  
-  - `true`: The configuration uses `renderRadiusScale`, `enableVerticalRange`, and `verticalRange`; `preset` is ignored (but may be updated internally when parameters match a preset).
+- `preset` – one of `"BALANCED"`, `"PERFORMANCE"`, `"AGGRESSIVE"`, or `"CUSTOM"`.  
+  - If the preset is not `"CUSTOM"`, the three manual parameters are ignored and the preset's values are used.  
+  - If the preset is `"CUSTOM"`, the manual parameters are used exactly as set.
 
 Changes take effect after restarting the game or reloading chunks.
 
@@ -103,11 +98,11 @@ Both approaches only affect chunk rendering; chunk loading remains square, so ga
 - Support status of Minecraft versions:
 
 | Versions | Support Status |
-|------|---------|
-| 26.1.2 | ✅ |
-| 26.1.1 | ✅ |
-| 26.1 | ✅ |
-| 1.21.11 | ✅ |
+|----------|----------------|
+| 26.1.2   | ✅ |
+| 26.1.1   | ✅ |
+| 26.1     | ✅ |
+| 1.21.11  | ✅ |
 | Lower versions | Will not support |
 
 - Fully compatible with Sodium 0.8.6+ (both mods can be used together).
