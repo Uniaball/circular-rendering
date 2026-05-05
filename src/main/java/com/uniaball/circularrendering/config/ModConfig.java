@@ -3,12 +3,15 @@ package com.uniaball.circularrendering.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ModConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModConfig.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("circular-rendering.json");
     private static ModConfig INSTANCE;
@@ -17,12 +20,12 @@ public class ModConfig {
     public boolean enableVerticalRange = false;
     public int verticalRange = 16;
     public Preset preset = Preset.BALANCED;
-    public boolean customMode = false;
 
     public enum Preset {
         AGGRESSIVE,
         PERFORMANCE,
-        BALANCED
+        BALANCED,
+        CUSTOM
     }
 
     public static ModConfig getInstance() {
@@ -38,7 +41,7 @@ public class ModConfig {
             try (var reader = Files.newBufferedReader(CONFIG_PATH)) {
                 config = GSON.fromJson(reader, ModConfig.class);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to load config, using defaults", e);
                 config = new ModConfig();
             }
         } else {
@@ -46,44 +49,44 @@ public class ModConfig {
         }
 
         config.syncFieldsFromPreset();
-
         config.save();
-
         return config;
     }
 
     private void syncFieldsFromPreset() {
-        if (!customMode) {
-            applyPreset(preset);
-        } else {
+        if (preset != Preset.CUSTOM) {
             Preset matched = getMatchingPreset();
-            if (matched != null && matched != preset) {
-                preset = matched;
+            if (matched != preset) {
+                LOGGER.warn("Config mismatch: preset={} but parameters don't match. Switching to CUSTOM to preserve settings.", preset);
+                preset = Preset.CUSTOM;
             }
         }
     }
 
-    private void applyPreset(Preset preset) {
+    public void applyPreset(Preset preset) {
         switch (preset) {
             case AGGRESSIVE:
-                renderRadiusScale = 0.4;
-                enableVerticalRange = true;
-                verticalRange = 3;
+                this.renderRadiusScale = 0.4;
+                this.enableVerticalRange = true;
+                this.verticalRange = 3;
                 break;
             case PERFORMANCE:
-                renderRadiusScale = 0.8;
-                enableVerticalRange = true;
-                verticalRange = 10;
+                this.renderRadiusScale = 0.8;
+                this.enableVerticalRange = true;
+                this.verticalRange = 10;
                 break;
             case BALANCED:
-                renderRadiusScale = 1.0;
-                enableVerticalRange = false;
-                verticalRange = 16;
+                this.renderRadiusScale = 1.0;
+                this.enableVerticalRange = false;
+                this.verticalRange = 16;
+                break;
+            case CUSTOM:
                 break;
         }
+        this.preset = preset;
     }
 
-    private Preset getMatchingPreset() {
+    public Preset getMatchingPreset() {
         if (Math.abs(renderRadiusScale - 1.0) < 1e-6 && !enableVerticalRange) {
             return Preset.BALANCED;
         } else if (Math.abs(renderRadiusScale - 0.4) < 1e-6 && enableVerticalRange && verticalRange == 3) {
@@ -98,7 +101,7 @@ public class ModConfig {
         try (var writer = Files.newBufferedWriter(CONFIG_PATH)) {
             GSON.toJson(this, writer);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to save config", e);
         }
     }
 }

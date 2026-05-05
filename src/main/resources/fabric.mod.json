@@ -31,6 +31,7 @@
                 "java": ">=25"
         },
         "recommends": {
-                "sodium": ">=0.8.7"
+                "sodium": ">=0.8.7",
+                "superfastmath": "*"
         }
 }

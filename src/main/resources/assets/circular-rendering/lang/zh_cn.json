@@ -1,12 +1,8 @@
 {
     "circular-rendering.options.title": "圆形渲染",
-    "circular-rendering.group.mode": "配置模式",
     "circular-rendering.group.preset": "预设",
     "circular-rendering.group.circle": "水平圆形",
     "circular-rendering.group.vertical": "垂直范围",
-
-    "circular-rendering.option.custom_mode": "启用自定义配置",
-    "circular-rendering.option.custom_mode.tooltip": "开启后，您可以自由调整所有参数，预设被禁用。关闭后，只能选择预设，其他选项将被锁定。",
 
     "circular-rendering.option.preset": "渲染预设",
     "circular-rendering.option.preset.tooltip": "快速切换预定义的配置组合。激进程度顺序：激进（40%缩放，3层）> 性能（80%缩放，10层）> 平衡（100%缩放，原版）。平衡预设同样有优化效果。",
@@ -23,5 +19,6 @@
 
     "circular-rendering.preset.aggressive": "激进",
     "circular-rendering.preset.performance": "性能",
-    "circular-rendering.preset.balanced": "平衡"
+    "circular-rendering.preset.balanced": "平衡",
+    "circular-rendering.preset.custom": "自定义"
 }

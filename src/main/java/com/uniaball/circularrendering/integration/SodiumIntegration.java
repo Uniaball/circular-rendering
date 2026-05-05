@@ -19,29 +19,6 @@ public class SodiumIntegration implements ConfigEntryPoint {
         OptionPageBuilder page = builder.createOptionPage();
         page.setName(Component.translatable("circular-rendering.options.title"));
 
-        OptionGroupBuilder modeGroup = builder.createOptionGroup();
-        modeGroup.setName(Component.translatable("circular-rendering.group.mode"));
-
-        Identifier customModeId = Identifier.parse("circular-rendering:custom_mode");
-        modeGroup.addOption(builder.createBooleanOption(customModeId)
-                .setName(Component.translatable("circular-rendering.option.custom_mode"))
-                .setTooltip(Component.translatable("circular-rendering.option.custom_mode.tooltip"))
-                .setStorageHandler(config::save)
-                .setBinding(
-                        (Boolean value) -> {
-                            boolean old = config.customMode;
-                            config.customMode = value;
-                            if (old && !value) {
-                                applyMatchingPreset();
-                            }
-                            config.save();
-                        },
-                        () -> config.customMode
-                )
-                .setDefaultValue(false)
-        );
-        page.addOptionGroup(modeGroup);
-
         OptionGroupBuilder presetGroup = builder.createOptionGroup();
         presetGroup.setName(Component.translatable("circular-rendering.group.preset"));
 
@@ -52,21 +29,14 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setStorageHandler(config::save)
                 .setBinding(
                         (ModConfig.Preset value) -> {
-                            if (applyingPreset) {
-                                config.preset = value;
-                                config.save();
-                                return;
-                            }
+                            if (applyingPreset) return;
                             applyingPreset = true;
-                            config.preset = value;
-                            applyPreset(value);
-                            config.save();
+                            config.applyPreset(value);
                             applyingPreset = false;
                         },
                         () -> config.preset
                 )
                 .setDefaultValue(ModConfig.Preset.BALANCED)
-                .setEnabledProvider(state -> !state.readBooleanOption(customModeId), customModeId)
                 .setElementNameProvider(preset -> {
                     Component name;
                     switch (preset) {
@@ -81,6 +51,10 @@ public class SodiumIntegration implements ConfigEntryPoint {
                         case BALANCED:
                             name = Component.translatable("circular-rendering.preset.balanced")
                                     .copy().withStyle(ChatFormatting.GREEN);
+                            break;
+                        case CUSTOM:
+                            name = Component.translatable("circular-rendering.preset.custom")
+                                    .copy().withStyle(ChatFormatting.AQUA);
                             break;
                         default:
                             name = Component.literal(preset.name());
@@ -99,17 +73,10 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setRange(10, 100, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (Integer value) -> {
-                            double newScale = value / 100.0;
-                            config.renderRadiusScale = newScale;
-                            if (config.customMode) {
-                                updatePresetIfNeeded();
-                            }
-                            config.save();
-                        },
+                        (Integer value) -> config.renderRadiusScale = value / 100.0,
                         () -> (int) Math.round(config.renderRadiusScale * 100)
                 )
-                .setEnabledProvider(state -> state.readBooleanOption(customModeId), customModeId)
+                .setEnabledProvider(state -> state.readEnumOption(presetId) == ModConfig.Preset.CUSTOM, presetId)
                 .setDefaultValue(100)
                 .setValueFormatter(v -> Component.literal(v + "%"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
@@ -124,16 +91,10 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setTooltip(Component.translatable("circular-rendering.option.enable_vertical_range.tooltip"))
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (Boolean value) -> {
-                            config.enableVerticalRange = value;
-                            if (config.customMode) {
-                                updatePresetIfNeeded();
-                            }
-                            config.save();
-                        },
+                        (Boolean value) -> config.enableVerticalRange = value,
                         () -> config.enableVerticalRange
                 )
-                .setEnabledProvider(state -> state.readBooleanOption(customModeId), customModeId)
+                .setEnabledProvider(state -> state.readEnumOption(presetId) == ModConfig.Preset.CUSTOM, presetId)
                 .setDefaultValue(false));
 
         verticalGroup.addOption(builder.createIntegerOption(Identifier.parse("circular-rendering:vertical_range"))
@@ -142,16 +103,13 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setRange(1, 32, 1)
                 .setStorageHandler(config::save)
                 .setBinding(
-                        (Integer value) -> {
-                            config.verticalRange = value;
-                            if (config.customMode) {
-                                updatePresetIfNeeded();
-                            }
-                            config.save();
-                        },
+                        (Integer value) -> config.verticalRange = value,
                         () -> config.verticalRange
                 )
-                .setEnabledProvider(state -> state.readBooleanOption(enableId) && state.readBooleanOption(customModeId), enableId, customModeId)
+                .setEnabledProvider(state ->
+                        state.readEnumOption(presetId) == ModConfig.Preset.CUSTOM &&
+                                state.readBooleanOption(enableId),
+                        presetId, enableId)
                 .setDefaultValue(16)
                 .setValueFormatter(v -> Component.literal(v + " " + Component.translatable("circular-rendering.option.vertical_range.unit").getString()))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
@@ -161,60 +119,5 @@ public class SodiumIntegration implements ConfigEntryPoint {
                 .setName("Circular Rendering")
                 .setIcon(Identifier.parse("circular-rendering:icon.png"))
                 .addPage(page);
-    }
-
-    private void applyPreset(ModConfig.Preset preset) {
-        switch (preset) {
-            case AGGRESSIVE:
-                config.renderRadiusScale = 0.4;
-                config.enableVerticalRange = true;
-                config.verticalRange = 3;
-                break;
-            case PERFORMANCE:
-                config.renderRadiusScale = 0.8;
-                config.enableVerticalRange = true;
-                config.verticalRange = 10;
-                break;
-            case BALANCED:
-                config.renderRadiusScale = 1.0;
-                config.enableVerticalRange = false;
-                config.verticalRange = 16;
-                break;
-        }
-    }
-
-    private void applyMatchingPreset() {
-        ModConfig.Preset matched = getMatchingPreset();
-        if (matched != null) {
-            applyingPreset = true;
-            config.preset = matched;
-            applyPreset(matched);
-            applyingPreset = false;
-        } else {
-            applyingPreset = true;
-            config.preset = ModConfig.Preset.BALANCED;
-            applyPreset(ModConfig.Preset.BALANCED);
-            applyingPreset = false;
-        }
-    }
-
-    private ModConfig.Preset getMatchingPreset() {
-        if (Math.abs(config.renderRadiusScale - 1.0) < 1e-6 && !config.enableVerticalRange) {
-            return ModConfig.Preset.BALANCED;
-        } else if (Math.abs(config.renderRadiusScale - 0.4) < 1e-6 && config.enableVerticalRange && config.verticalRange == 3) {
-            return ModConfig.Preset.AGGRESSIVE;
-        } else if (Math.abs(config.renderRadiusScale - 0.8) < 1e-6 && config.enableVerticalRange && config.verticalRange == 10) {
-            return ModConfig.Preset.PERFORMANCE;
-        }
-        return null;
-    }
-
-    private void updatePresetIfNeeded() {
-        if (!config.customMode) return;
-        ModConfig.Preset matched = getMatchingPreset();
-        if (matched != null && config.preset != matched) {
-            config.preset = matched;
-            config.save();
-        }
     }
 }
