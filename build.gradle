@@ -15,13 +15,6 @@ repositories {
 		name = "CaffeineMC"
 		url = "https://maven.caffeinemc.net/releases/"
 	}
-        maven {
-            name = "Modrinth"
-            url = "https://api.modrinth.com/maven"
-            content {
-                includeGroup "maven.modrinth"
-            }
-        }
 }
 
 dependencies {
