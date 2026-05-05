@@ -76,7 +76,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                         (Integer value) -> config.renderRadiusScale = value / 100.0,
                         () -> (int) Math.round(config.renderRadiusScale * 100)
                 )
-                .setEnabledProvider(state -> state.readEnumOption(presetId) == ModConfig.Preset.CUSTOM, presetId)
+                .setEnabledProvider(state -> state.readEnumOption(presetId, ModConfig.Preset.class) == ModConfig.Preset.CUSTOM, presetId)
                 .setDefaultValue(100)
                 .setValueFormatter(v -> Component.literal(v + "%"))
                 .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD));
@@ -94,7 +94,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                         (Boolean value) -> config.enableVerticalRange = value,
                         () -> config.enableVerticalRange
                 )
-                .setEnabledProvider(state -> state.readEnumOption(presetId) == ModConfig.Preset.CUSTOM, presetId)
+                .setEnabledProvider(state -> state.readEnumOption(presetId, ModConfig.Preset.class) == ModConfig.Preset.CUSTOM, presetId)
                 .setDefaultValue(false));
 
         verticalGroup.addOption(builder.createIntegerOption(Identifier.parse("circular-rendering:vertical_range"))
@@ -107,7 +107,7 @@ public class SodiumIntegration implements ConfigEntryPoint {
                         () -> config.verticalRange
                 )
                 .setEnabledProvider(state ->
-                        state.readEnumOption(presetId) == ModConfig.Preset.CUSTOM &&
+                        state.readEnumOption(presetId, ModConfig.Preset.class) == ModConfig.Preset.CUSTOM &&
                                 state.readBooleanOption(enableId),
                         presetId, enableId)
                 .setDefaultValue(16)
