@@ -4,7 +4,7 @@
     "circular-rendering.group.circle": "Horizontal Circle",
     "circular-rendering.group.vertical": "Vertical Range",
 
-    "circular-rendering.option.preset": "Render Preset",
+    "circular-rendering.option.preset": "Render Preset (Switch to custom mode to edit individual configurations.)",
     "circular-rendering.option.preset.tooltip": "Quickly switch between predefined configurations. Aggressiveness order: Aggressive (40% scale, 3 layers) > Performance (80% scale, 10 layers) > Balanced (100% scale, vanilla). Balanced presets also have optimization effects.",
 
     "circular-rendering.option.render_radius_scale": "Render Radius Scale",
