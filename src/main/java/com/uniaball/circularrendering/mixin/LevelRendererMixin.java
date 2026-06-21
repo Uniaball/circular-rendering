@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -71,9 +70,9 @@ public class LevelRendererMixin {
         Iterator<RenderSection> iterator = visibleSections.iterator();
         while (iterator.hasNext()) {
             RenderSection section = iterator.next();
-            Vec3 center = section.getRenderOrigin().getCenter();
-            double dx = center.x - playerX;
-            double dz = center.z - playerZ;
+            BlockPos origin = section.getRenderOrigin();
+            double dx = origin.getX() + 8 - playerX;
+            double dz = origin.getZ() + 8 - playerZ;
 
             double forward = dx * dirX + dz * dirZ;
             double right = -dx * dirZ + dz * dirX;
@@ -84,7 +83,7 @@ public class LevelRendererMixin {
             }
 
             if (verticalEnabled) {
-                int chunkY = section.getRenderOrigin().getY() >> 4;
+                int chunkY = origin.getY() >> 4;
                 if (Math.abs(chunkY - playerChunkY) > verticalRange) {
                     iterator.remove();
                 }
