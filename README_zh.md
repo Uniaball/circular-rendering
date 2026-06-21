@@ -83,13 +83,16 @@
 
 ## 工作原理
 
-- **原版模式（无 Sodium）：** 模组注入 `WorldRenderer.renderBlockLayers` 方法，过滤区块列表，保留符合以下形状的区块：
+- **原版模式（无 Sodium）：** 模组注入 `LevelRenderer.cullTerrain` 方法，过滤区块列表，保留符合以下形状的区块：
   ```
   (forward² / a²) + (right² / b²) ≤ 1
   ```
   其中 `a = 视距 × 16`（固定前后半径），`b = a × renderRadiusScale`（左右半径）。  
   当 `b = a` 时，形状为正圆。若启用了垂直范围，还会检查区块 Y 层。
-- **Sodium 模式：** 模组注入 Sodium 的 `OcclusionCuller.isWithinRenderDistance` 方法，对形状外或超出垂直范围的区块返回 `false`。
+
+- **Sodium 模式：** 注入点取决于 Minecraft 版本：
+  - **MC 26.2 及以上：** 模组重定向 `OcclusionCuller.visitNode` 内部的 `testDistance` 调用，在基于图的遮挡剔除遍历中直接替换原版的圆柱距离检查为椭圆公式，完整保留剔除结构。
+  - **MC 26.1.x 及以下：** 模组注入 `OcclusionCuller.isWithinRenderDistance` 方法，对椭圆（或垂直范围）外的区块返回 `false`，从而从 Sodium 的可见集中过滤掉这些区块。
 
 两种方式都只影响区块渲染；区块加载保持方形，因此游戏机制（红石、实体 AI 等）在所有位置均正常工作。
 
@@ -99,7 +102,7 @@
 
 | 版本 | 支持情况 |
 |------|---------|
-| 26.2   | ⚠️（开发中）|
+| 26.2   | ✅ |
 | 26.1.2 | ✅ |
 | 26.1.1 | ✅ |
 | 26.1   | ✅ |

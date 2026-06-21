@@ -83,13 +83,16 @@ Changes take effect after restarting the game or reloading chunks.
 
 ## How It Works
 
-- **Vanilla mode (no Sodium):** The mod injects into `WorldRenderer.renderBlockLayers` and filters the chunk list using the shape defined by:
+- **Vanilla mode (no Sodium):** The mod injects into `LevelRenderer.cullTerrain` and filters the chunk list using the shape defined by:
   ```
   (forward² / a²) + (right² / b²) ≤ 1
   ```
   where `a = view distance × 16` (fixed forward/backward radius) and `b = a × renderRadiusScale` (left/right radius).  
   When `b = a`, the shape is a circle. If vertical range is enabled, it also checks chunk Y layers.
-- **Sodium mode:** The mod injects into Sodium's `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside this shape or vertical range.
+
+- **Sodium mode:** The injection point depends on the Minecraft version:
+  - **MC 26.2 and above:** The mod redirects the `testDistance` call inside `OcclusionCuller.visitNode`. This replaces Sodium's default cylindrical distance check with the elliptical formula directly within the graph‑based occlusion culling traversal, preserving the full culling structure.
+  - **MC 26.1.x and below:** The mod injects into `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside the ellipse (or vertical range), effectively filtering them from Sodium's visible set.
 
 Both approaches only affect chunk rendering; chunk loading remains square, so game mechanics (redstone, entity AI, etc.) work normally everywhere.
 
@@ -99,7 +102,7 @@ Both approaches only affect chunk rendering; chunk loading remains square, so ga
 
 | Versions | Support Status |
 |----------|----------------|
-| 26.2     | ⚠️ (Developing) |
+| 26.2     | ✅ |
 | 26.1.2   | ✅ |
 | 26.1.1   | ✅ |
 | 26.1     | ✅ |
