@@ -10,8 +10,10 @@ import net.minecraft.client.renderer.chunk.SectionRenderDispatcher.RenderSection
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,10 +26,15 @@ public class LevelRendererMixin {
     @Shadow
     private ObjectArrayList<RenderSection> visibleSections;
 
+    @Unique
     private int lastViewDistance = -1;
+    @Unique
     private double lastScale = -1.0;
+    @Unique
     private double cachedA2 = 0;
+    @Unique
     private double cachedB2 = 0;
+    @Unique
     private double cachedAB2 = 0;
 
     @Inject(method = "cullTerrain", at = @At("RETURN"))
@@ -58,46 +65,27 @@ public class LevelRendererMixin {
         double dirZ = Mth.cos((float) yawRad);
 
         boolean verticalEnabled = config.enableVerticalRange;
+        int verticalRange = config.verticalRange;
+        int playerChunkY = verticalEnabled ? player.getBlockY() >> 4 : 0;
+
         Iterator<RenderSection> iterator = visibleSections.iterator();
+        while (iterator.hasNext()) {
+            RenderSection section = iterator.next();
+            Vec3 center = section.getRenderOrigin().getCenter();
+            double dx = center.x - playerX;
+            double dz = center.z - playerZ;
 
-        if (verticalEnabled) {
-            int verticalRange = config.verticalRange;
-            int playerChunkY = player.getBlockY() >> 4;
+            double forward = dx * dirX + dz * dirZ;
+            double right = -dx * dirZ + dz * dirX;
 
-            while (iterator.hasNext()) {
-                RenderSection section = iterator.next();
-                BlockPos origin = section.getRenderOrigin();
-                double centerX = origin.getX() + 8;
-                double centerZ = origin.getZ() + 8;
-                double dx = centerX - playerX;
-                double dz = centerZ - playerZ;
-
-                double forward = dx * dirX + dz * dirZ;
-                double right = -dx * dirZ + dz * dirX;
-
-                if (forward * forward * cachedB2 + right * right * cachedA2 > cachedAB2) {
-                    iterator.remove();
-                    continue;
-                }
-
-                int chunkY = origin.getY() >> 4;
-                if (Math.abs(chunkY - playerChunkY) > verticalRange) {
-                    iterator.remove();
-                }
+            if (forward * forward * cachedB2 + right * right * cachedA2 > cachedAB2) {
+                iterator.remove();
+                continue;
             }
-        } else {
-            while (iterator.hasNext()) {
-                RenderSection section = iterator.next();
-                BlockPos origin = section.getRenderOrigin();
-                double centerX = origin.getX() + 8;
-                double centerZ = origin.getZ() + 8;
-                double dx = centerX - playerX;
-                double dz = centerZ - playerZ;
 
-                double forward = dx * dirX + dz * dirZ;
-                double right = -dx * dirZ + dz * dirX;
-
-                if (forward * forward * cachedB2 + right * right * cachedA2 > cachedAB2) {
+            if (verticalEnabled) {
+                int chunkY = section.getRenderOrigin().getY() >> 4;
+                if (Math.abs(chunkY - playerChunkY) > verticalRange) {
                     iterator.remove();
                 }
             }
