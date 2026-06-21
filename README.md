@@ -99,6 +99,7 @@ Both approaches only affect chunk rendering; chunk loading remains square, so ga
 
 | Versions | Support Status |
 |----------|----------------|
+| 26.2     | ⚠️ (Developing) |
 | 26.1.2   | ✅ |
 | 26.1.1   | ✅ |
 | 26.1     | ✅ |
