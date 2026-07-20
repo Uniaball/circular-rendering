@@ -24,7 +24,6 @@ You can optionally scale the left/right radius to create an ellipse, culling mor
 
 - **Required:** [Fabric Loader](https://fabricmc.net/) ≥0.18.4
 - **Optional:** [Sodium](https://modrinth.com/mod/sodium) 0.8.6+ (for in-game GUI configuration)
-- **Optional:** [Super Fast Math](https://modrinth.com/mod/super-fast-math) any version (for faster math)
 
 ## Installation
 

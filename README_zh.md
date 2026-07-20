@@ -24,7 +24,6 @@
 
 - **必需：** [Fabric Loader](https://fabricmc.net/) ≥0.18.4
 - **可选：** [Sodium](https://modrinth.com/mod/sodium) 0.8.6+（用于游戏内配置界面）
-- **可选：** [Super Fast Math](https://modrinth.com/mod/super-fast-math) 任意版本（用于更快的数学）
 
 ## 安装
 
