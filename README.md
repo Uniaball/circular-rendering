@@ -90,8 +90,8 @@ Changes take effect after restarting the game or reloading chunks.
   When `b = a`, the shape is a circle. If vertical range is enabled, it also checks chunk Y layers.
 
 - **Sodium mode:** The injection point depends on the Minecraft version:
-  - **MC 26.2 and above:** The mod redirects the `testDistance` call inside `OcclusionCuller.visitNode`. This replaces Sodium's default cylindrical distance check with the elliptical formula directly within the graph‑based occlusion culling traversal, preserving the full culling structure.
-  - **MC 26.1.x and below:** The mod injects into `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside the ellipse (or vertical range), effectively filtering them from Sodium's visible set.
+  - **MC 26.1.2 and above:** The mod redirects the `testDistance` call inside `OcclusionCuller.visitNode`. This replaces Sodium's default cylindrical distance check with the elliptical formula directly within the graph‑based occlusion culling traversal, preserving the full culling structure.
+  - **MC 26.1.1 and below:** The mod injects into `OcclusionCuller.isWithinRenderDistance` and returns `false` for chunks outside the ellipse (or vertical range), effectively filtering them from Sodium's visible set.
 
 Both approaches only affect chunk rendering; chunk loading remains square, so game mechanics (redstone, entity AI, etc.) work normally everywhere.
 

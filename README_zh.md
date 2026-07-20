@@ -90,8 +90,8 @@
   当 `b = a` 时，形状为正圆。若启用了垂直范围，还会检查区块 Y 层。
 
 - **Sodium 模式：** 注入点取决于 Minecraft 版本：
-  - **MC 26.2 及以上：** 模组重定向 `OcclusionCuller.visitNode` 内部的 `testDistance` 调用，在基于图的遮挡剔除遍历中直接替换原版的圆柱距离检查为椭圆公式，完整保留剔除结构。
-  - **MC 26.1.x 及以下：** 模组注入 `OcclusionCuller.isWithinRenderDistance` 方法，对椭圆（或垂直范围）外的区块返回 `false`，从而从 Sodium 的可见集中过滤掉这些区块。
+  - **MC 26.1.2 及以上：** 模组重定向 `OcclusionCuller.visitNode` 内部的 `testDistance` 调用，在基于图的遮挡剔除遍历中直接替换原版的圆柱距离检查为椭圆公式，完整保留剔除结构。
+  - **MC 26.1.1 及以下：** 模组注入 `OcclusionCuller.isWithinRenderDistance` 方法，对椭圆（或垂直范围）外的区块返回 `false`，从而从 Sodium 的可见集中过滤掉这些区块。
 
 两种方式都只影响区块渲染；区块加载保持方形，因此游戏机制（红石、实体 AI 等）在所有位置均正常工作。
 
